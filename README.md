@@ -10,5 +10,5 @@ Simulate the behavior of the gravitation between planets and stars.
 * Press right mouse button to create a static body.
 * Press backspace to remove the last moving body.
 
-## Pircutres
-![alt text](https://media.istockphoto.com/photos/freedom-chains-that-transform-into-birds-charge-concept-picture-id1322104312?b=1&k=20&m=1322104312&s=170667a&w=0&h=VQyPkFkMKmo0e4ixjhiOLjiRs_ZiyKR_4SAsagQQdkk=)
+## Example
+![Alt text](https://raw.githubusercontent.com/Monkvy/Gravitational-Attraction/main/Example.gif)
