@@ -24,9 +24,10 @@ class Body:
 
         self.path.append(self.position.copy())
         if len(self.path) > 500:
-            self.path.pop(0)
+            pass
+            #self.path.pop(0)
 
     def show(self, surface: pygame.Surface):
         for pos in self.path:
-            pygame.draw.circle(surface, self.PATH_COLOR, pos.toTuple(), 1)
-        pygame.draw.circle(surface, self.BODY_COLOR, self.position.toTuple(), 4)
+            pygame.draw.rect(surface, self.PATH_COLOR, [pos.x, pos.y, 1, 1])
+        #pygame.draw.circle(surface, self.BODY_COLOR, self.position.toTuple(), 4)

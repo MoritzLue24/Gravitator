@@ -1,3 +1,4 @@
+from math import pi, sqrt
 from VectorUtils.Vector import *
 from StaticBody import *
 from Body import *
@@ -25,7 +26,7 @@ static_bodies = []
 creating_body = False
 current_body_pos = Vector2(0, 0)
 current_vel = Vector2(0, 0)
-
+G = 6 # 6.67e-11
 
 # <--- Mainloop --->
 while True:
@@ -43,7 +44,7 @@ while True:
             if pygame.mouse.get_pressed()[0]:
                 creating_body = True
                 current_body_pos = Vector2.fromTuple(mousePos)
-            # Add static body if second mouse button is pressed
+            # Create static body
             elif pygame.mouse.get_pressed()[2]:
                 static_bodies.append(StaticBody(Vector2.fromTuple(mousePos), 50))
                 
@@ -53,6 +54,7 @@ while True:
                 bodies.append(Body(current_body_pos, current_vel * 5, 50))
 
         elif event.type == pygame.KEYDOWN:
+            # Remove last body
             if event.key == pygame.K_BACKSPACE:
                 if len(bodies) > 0: bodies.pop()
     
@@ -66,17 +68,20 @@ while True:
         current_body_pos = Vector2(0, 0)
         current_vel = Vector2(0, 0)
 
+    # Draw static bodies and attract all bodies
     for static_body in static_bodies:
         static_body.show(screen)
         for body in bodies:
-            static_body.attract(body)
+            static_body.attract(body, G)
     
+    # Update & draw bodies
     total_path_pixels = 0
     for body in bodies:
         body.update(deltaTime)
         body.show(screen)
         total_path_pixels += len(body.path)
 
+    # Render info
     renderText(f'FPS: {str(clock.get_fps())}', Vector2(10, 10), (255, 255, 255))
     renderText(f'Total path pixels: {str(total_path_pixels)}', Vector2(10, 30), (255, 255, 255))
     renderText(f'Total bodies: {str(len(bodies))}', Vector2(10, 50), (255, 255, 255))
@@ -85,6 +90,7 @@ while True:
     renderText(f'Body position: {current_body_pos}', Vector2(10, 140), (255, 255, 255))
     renderText(f'Body velocity: {current_vel}', Vector2(10, 160), (255, 255, 255))
 
+    # Update dt & display
     deltaTime = 1/clock.get_fps() if clock.get_fps() != 0 else 0.0
     pygame.display.flip()
     clock.tick()
