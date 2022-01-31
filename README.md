@@ -14,6 +14,7 @@ Simulate the behavior of the gravitation between planets and stars.
 * Press and hold left mouse button to create a dynamic body.
 * Press right mouse button to create a static body.
 * Press backspace to remove all bodies.
+* Press escape to pause / continue.
 * Press q to exit.
 
 ## Example
