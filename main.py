@@ -1,13 +1,12 @@
 from math import sqrt
 from VectorUtils.Vector import *
-from StaticBody import *
 from Body import *
 from gui import *
 import pygame
 import sys
 
 
-# <--- Setup pygame --->
+# Setup pygame
 pygame.init()
 WIDTH, HEIGHT = 1280, 720
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -17,32 +16,38 @@ clock = pygame.time.Clock()
 deltaTime = 0.0
 
 
-# <--- Variables --->
+# Variables
 G = 6.67e-11 # 6.67e-11
 bodies = []
 old_paths = []
 creating_body = 'None'
 current_body_pos = Vector2(0, 0)
 current_vel = Vector2(0, 0)
-
 paused = False
+running = True
+
+# Inputs
 dynamic_mass_input = InputField(Vector2(10, 240), Vector2(80, 20), str(Body.DEFAULT_DYNAMIC_MASS))
 static_mass_input = InputField(Vector2(10, 290), Vector2(80, 20), str(Body.DEFAULT_STATIC_MASS))
-path_limit_input = InputField(Vector2(10, 350), Vector2(80, 20), str(Body.path_limit))
+path_limit_input = InputField(Vector2(10, 340), Vector2(80, 20), str(Body.path_limit))
+dynamic_attract_input = InputField(Vector2(10, 390), Vector2(80, 20), 'True')
+can_collide_input = InputField(Vector2(10, 440), Vector2(80, 20), 'True')
 
-# <--- Mainloop --->
-while True:
+# Mainloop
+while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
+            running = False
         
+        # Check for input field events
         if (dynamic_mass_input.events(event) or 
             static_mass_input.events(event) or
-            path_limit_input.events(event)):
+            path_limit_input.events(event) or 
+            dynamic_attract_input.events(event) or
+            can_collide_input.events(event)):
             continue
 
-        # <--- Mouse events --->
+        # Mouse events
         mousePos = pygame.mouse.get_pos()
         if creating_body != 'None':
             current_vel = current_body_pos - Vector2.fromTuple(mousePos)
@@ -58,12 +63,12 @@ while True:
                 
         elif event.type == pygame.MOUSEBUTTONUP:
             if creating_body != 'None':
+                # Create static body
                 if creating_body == 'Static':
                     try:
                         mass = float(static_mass_input.text)
                     except ValueError:
                         mass = Body.DEFAULT_STATIC_MASS
-
                     bodies.append(Body(
                         current_body_pos, 
                         current_vel * 5, 
@@ -71,6 +76,7 @@ while True:
                         color=Body.STATIC_COLOR, 
                         mass=mass))
                 else:
+                    # Create dynamic body
                     try:
                         mass = float(dynamic_mass_input.text)
                     except ValueError:
@@ -79,19 +85,20 @@ while True:
                     bodies.append(Body(current_body_pos, current_vel * 5, mass=mass))
                 creating_body = 'None'
 
+        # Key events
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
-                pygame.quit()
-                sys.exit()
+                running = False
             elif event.key == pygame.K_c:
                 old_paths = []
                 bodies = []
             elif event.key == pygame.K_ESCAPE:
                 paused = not paused
     
-    # <--- Render here --->
+    # Render & update
     screen.fill((0, 0, 0))
 
+    # Draw body preview when creating body
     if creating_body != 'None':
         try:
             mass = float(dynamic_mass_input.text if creating_body == 'Dynamic' else static_mass_input.text)
@@ -107,7 +114,8 @@ while True:
     else:
         current_body_pos = Vector2(0, 0)
         current_vel = Vector2(0, 0)
-    
+
+    # Draw old paths (paths of bodies that collided with other bodies)
     for path in old_paths:
         for pixel in path[0]:
             pygame.draw.rect(
@@ -125,8 +133,12 @@ while True:
         body.update()
         for other in bodies:
             if body != other:
-                body.attract(other)
-                if body.checkCollision(other):
+                # Attract
+                if (dynamic_attract_input.text == 'True') or (body.static):
+                    body.attract(other)
+                # Collision
+                if (body.checkCollision(other)) and (can_collide_input.text == 'True'):
+                    # Remove the body with less mass
                     if body.mass > other.mass:
                         body.setMass(body.mass + other.mass)
                         bodies.remove(other)
@@ -137,9 +149,10 @@ while True:
                         old_paths.append((body.path, body.static))
 
 
-    # Render info
+    # Paused info
     renderText(('PAUSED' if paused else 'RUNNING') + ' ([escape] to pause / continue)', Vector2(10, 10), font)
 
+    # Stats
     renderText(f'FPS: {clock.get_fps()}', Vector2(10, 40), font)
     renderText(f'G: {G}', Vector2(10, 60), font)
     renderText(f'Total path pixels: {total_path_pixels}', Vector2(10, 80), font)
@@ -148,17 +161,29 @@ while True:
     renderText(f'Body position: {current_body_pos}', Vector2(10, 160), font)
     renderText(f'Body velocity: {current_vel}', Vector2(10, 180), font)
 
+    # Mass input
     renderText('Dynamic body mass:', Vector2(10, 220), font)
     dynamic_mass_input.draw(font)
     renderText('Static body mass:', Vector2(10, 270), font)
     static_mass_input.draw(font)
 
-    renderText('Path limit per body: ', Vector2(10, 330), font)
+    # Path limit input
+    renderText('Path limit per body: ', Vector2(10, 320), font)
     path_limit_input.draw(font)
     Body.path_limit = path_limit_input.text
+
+    # Dynamic attract input
+    renderText('Dynamic bodies attract eachother: ', Vector2(10, 370), font)
+    dynamic_attract_input.draw(font)
+
+    # Can collide input
+    renderText('Bodies can collide: ', Vector2(10, 420), font)
+    can_collide_input.draw(font)
 
     # Update dt & display
     deltaTime = 1/clock.get_fps() if clock.get_fps() != 0 else 0.0
     pygame.display.flip()
     clock.tick()
 
+pygame.quit()
+sys.exit()
