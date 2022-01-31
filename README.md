@@ -16,6 +16,6 @@ Simulate the behavior of the gravitation between planets and stars.
 * Press backspace to remove all bodies.
 * Press escape to pause / continue.
 * Press q to exit.
-
+ 
 ## Example
 ![Alt text](https://raw.githubusercontent.com/Monkvy/Gravitational-Attraction/main/Example.gif)
