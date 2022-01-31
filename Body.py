@@ -30,7 +30,7 @@ class Body:
 
     def applyForce(self, force: Vector2):
         if self.static: return
-        f = force / self.mass
+        f = force / self.mass * 0.1
         self.acc += f
 
     def checkCollision(self, body):
