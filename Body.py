@@ -30,7 +30,7 @@ class Body:
 
     def applyForce(self, force: Vector2):
         if self.static: return
-        f = force / self.mass * 0.1
+        f = force / self.mass
         self.acc += f
 
     def checkCollision(self, body):
@@ -48,9 +48,9 @@ class Body:
         force.setMag(strength)
         body.applyForce(force)
 
-    def update(self):
+    def update(self, dt: float):
         self.velocity += self.acc
-        self.position += self.velocity * 0.01
+        self.position += self.velocity * dt
         self.acc = Vector2(0, 0)
 
         self.path.append(self.position.copy())
@@ -67,5 +67,5 @@ class Body:
                 pygame.display.get_surface(), 
                 self.STATIC_PATH_COLOR if self.static else self.DYNAMIC_PATH_COLOR, 
                 [pos.x, pos.y, 1, 1])
-                
+        
         pygame.draw.circle(pygame.display.get_surface(), self.color, self.position.toTuple(), self.r)
