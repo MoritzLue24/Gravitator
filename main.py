@@ -1,4 +1,5 @@
 from math import sqrt
+from re import T
 from VectorUtils.Vector import *
 from Body import *
 from gui import *
@@ -26,14 +27,16 @@ current_vel = Vector2(0, 0)
 paused = False
 running = True
 
-# Inputs
-current_pos_input = InputField(Vector2(10, 180), Vector2(80, 20), 'AUTO')
-current_vel_input = InputField(Vector2(10, 230), Vector2(80, 20), 'AUTO')
-dynamic_mass_input = InputField(Vector2(10, 280), Vector2(80, 20), str(Body.DEFAULT_DYNAMIC_MASS))
-static_mass_input = InputField(Vector2(10, 330), Vector2(80, 20), str(Body.DEFAULT_STATIC_MASS))
-path_limit_input = InputField(Vector2(10, 380), Vector2(80, 20), str(Body.path_limit))
-dynamic_attract_input = InputField(Vector2(10, 430), Vector2(80, 20), 'True')
-can_collide_input = InputField(Vector2(10, 480), Vector2(80, 20), 'True')
+# Widgets
+current_pos_input = InputField(Vector2(10, 180), Vector2(80, 20), 'Body position:', 'AUTO')
+current_vel_input = InputField(Vector2(10, 230), Vector2(80, 20), 'Body velocity:', 'AUTO')
+dynamic_mass_input = InputField(Vector2(10, 280), Vector2(80, 20), 'Dynamic body mass:', str(Body.DEFAULT_DYNAMIC_MASS))
+static_mass_input = InputField(Vector2(10, 330), Vector2(80, 20), 'Static body mass:', str(Body.DEFAULT_STATIC_MASS))
+path_limit_input = InputField(Vector2(10, 380), Vector2(80, 20), 'Path limit:', str(Body.path_limit))
+dynamic_attract_input = Checkbox(Vector2(10, 430), Vector2(20, 20), 'Dynamic bodies attract eachother:')
+can_collide_input = Checkbox(Vector2(10, 480), Vector2(20, 20), 'Bodies can collide:')
+path_color_multiplier_input = InputField(Vector2(10, 530), Vector2(40, 20), 'Path color multiplier:', str(Body.path_color_multiplier))
+
 
 # Mainloop
 while running:
@@ -41,15 +44,8 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         
-        # Check for input field events
-        if (current_pos_input.events(event) or
-            current_vel_input.events(event) or
-            dynamic_mass_input.events(event) or 
-            static_mass_input.events(event) or
-            path_limit_input.events(event) or 
-            dynamic_attract_input.events(event) or
-            can_collide_input.events(event)):
-            continue
+        # Check for all widget events
+        if Widget.events(event): continue
 
         # Mouse events
         mousePos = pygame.mouse.get_pos()
@@ -141,11 +137,24 @@ while running:
 
     # Draw old paths (paths of bodies that collided with other bodies)
     for path in old_paths:
-        for pixel in path[0]:
-            pygame.draw.rect(
-                screen,
-                Body.STATIC_PATH_COLOR if path[1] else Body.DYNAMIC_PATH_COLOR, 
-                [pixel.x, pixel.y, 1, 1])
+        for p in range(len(path[0])):
+            if p >= 1:
+                # Get dist between the last two points
+                dist = path[0][p].getDist(path[0][p-1])
+
+                # Get color
+                org_path_color = Body.STATIC_PATH_COLOR if path[1] else Body.DYNAMIC_PATH_COLOR
+                color = (
+                    constrain(dist * Body.path_color_multiplier * org_path_color[0], 0, 255), 
+                    constrain(dist * Body.path_color_multiplier * org_path_color[1], 0, 255), 
+                    constrain(dist * Body.path_color_multiplier * org_path_color[2], 0, 255))
+
+                # Render
+                pygame.draw.line(
+                    pygame.display.get_surface(), 
+                    color, 
+                    path[0][p].toTuple(),
+                    path[0][p-1].toTuple())
 
     # Update & draw bodies
     total_path_pixels = 0
@@ -158,10 +167,10 @@ while running:
         for other in bodies:
             if body != other:
                 # Attract
-                if (dynamic_attract_input.text == 'True') or (body.static):
+                if (dynamic_attract_input.active) or (body.static):
                     body.attract(other)
                 # Collision
-                if (body.checkCollision(other)) and (can_collide_input.text == 'True'):
+                if (body.checkCollision(other)) and (can_collide_input.active):
                     # Remove the body with less mass
                     if body.mass > other.mass:
                         body.setMass(body.mass + other.mass)
@@ -172,41 +181,28 @@ while running:
                         bodies.remove(body)
                         old_paths.append((body.path, body.static))
 
-
-    # Paused info
+    # Render paused info
     renderText(('PAUSED' if paused else 'RUNNING') + ' ([escape] to pause / continue)', Vector2(10, 10), font)
 
-    # Stats
+    # Render stats
     renderText(f'FPS: {clock.get_fps()}', Vector2(10, 40), font)
     renderText(f'G: {G}', Vector2(10, 60), font)
     renderText(f'Total path pixels: {total_path_pixels}', Vector2(10, 80), font)
     renderText(f'Total bodies: {len(bodies)}', Vector2(10, 100), font)
     renderText('Hold [leftclick] / [rightclick] to create dynamic / static body', Vector2(10, 140), font)
 
-    # Pos & vel input
-    renderText('Body position:', Vector2(10, 160), font)
-    current_pos_input.draw(font)
-    renderText('Body velocity:', Vector2(10, 210), font)
-    current_vel_input.draw(font)
+    # Render all widgets
+    Widget.render(font)
 
-    # Mass input
-    renderText('Dynamic body mass:', Vector2(10, 260), font)
-    dynamic_mass_input.draw(font)
-    renderText('Static body mass:', Vector2(10, 310), font)
-    static_mass_input.draw(font)
-
-    # Path limit input
-    renderText('Path limit per body: ', Vector2(10, 360), font)
-    path_limit_input.draw(font)
+    # Update the path limit
     Body.path_limit = path_limit_input.text
 
-    # Dynamic attract input
-    renderText('Dynamic bodies attract eachother: ', Vector2(10, 410), font)
-    dynamic_attract_input.draw(font)
+    # Set path color multiplier
+    try:
+        Body.path_color_multiplier = float(path_color_multiplier_input.text)
+    except ValueError:
+        Body.path_color_multiplier = Body.DEFAULT_PATH_COLOR_MULTIPLIER
 
-    # Can collide input
-    renderText('Bodies can collide: ', Vector2(10, 460), font)
-    can_collide_input.draw(font)
 
     # Update dt & display
     deltaTime = 1/clock.get_fps() if clock.get_fps() != 0 else 0.0
