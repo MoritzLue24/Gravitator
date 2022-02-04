@@ -1,3 +1,4 @@
+from os import stat
 from VectorUtils.Vector import *
 import pygame
 

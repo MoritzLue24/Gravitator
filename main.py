@@ -1,5 +1,4 @@
 from math import sqrt
-from re import T
 from VectorUtils.Vector import *
 from Body import *
 from gui import *
@@ -18,7 +17,7 @@ deltaTime = 0.0
 
 
 # Variables
-G = 6.67e-11 # 6.67e-11
+G = 120 # 6.67e-11
 bodies = []
 old_paths = []
 creating_body = 'None'
@@ -41,26 +40,28 @@ path_color_multiplier_input = InputField(Vector2(10, 530), Vector2(40, 20), 'Pat
 # Mainloop
 while running:
     for event in pygame.event.get():
+        # Default close operation
         if event.type == pygame.QUIT:
             running = False
         
         # Check for all widget events
         if Widget.events(event): continue
 
-        # Mouse events
+        # Get mouse position and calculate current velocity if creating body is true
         mousePos = pygame.mouse.get_pos()
         if creating_body != 'None':
             current_vel = current_pos - Vector2.fromTuple(mousePos)
 
+        # Start creating a dynamic or static body
         if event.type == pygame.MOUSEBUTTONDOWN:
             if pygame.mouse.get_pressed()[0]:
                 creating_body = 'Dynamic'
                 current_pos = Vector2.fromTuple(mousePos)
-            # Create static body
             elif pygame.mouse.get_pressed()[2]:
                 creating_body = 'Static'
                 current_pos = Vector2.fromTuple(mousePos)
-                
+        
+        # Finish creating a dynamic or static body
         elif event.type == pygame.MOUSEBUTTONUP:
             if creating_body != 'None':
                 # Get position
@@ -85,23 +86,22 @@ while running:
 
                 # Create static body
                 if creating_body == 'Static':
+                    # Get the mass
                     try:
                         mass = float(static_mass_input.text)
                     except ValueError:
                         mass = Body.DEFAULT_STATIC_MASS
-
-                    bodies.append(Body(
-                        pos, 
-                        vel, 
-                        static=True, 
-                        color=Body.STATIC_COLOR, 
-                        mass=mass))
+                    # Append the list
+                    bodies.append(Body(pos, vel, static=True, color=Body.STATIC_COLOR, mass=mass))
+                
+                # Create dynamic body
                 else:
-                    # Create dynamic body
+                    # Get the mass
                     try:
                         mass = float(dynamic_mass_input.text)
                     except ValueError:
                         mass = Body.DEFAULT_DYNAMIC_MASS
+                    # Append the list
                     bodies.append(Body(pos, vel, mass=mass))
                 creating_body = 'None'
 
@@ -120,18 +120,23 @@ while running:
 
     # Draw body preview when creating body
     if creating_body != 'None':
+        # Get the mass to calculate the radius
         try:
             mass = float(dynamic_mass_input.text if creating_body == 'Dynamic' else static_mass_input.text)
         except ValueError:
             mass = Body.DEFAULT_DYNAMIC_MASS if creating_body == 'Dynamic' else Body.DEFAULT_STATIC_MASS
 
+        # Draw velocity preview
         pygame.draw.line(screen, (0, 0, 255), current_pos.toTuple(), (current_pos - current_vel).toTuple(), 2)
+
+        # Draw the body
         pygame.draw.circle(
             screen, 
             Body.DYNAMIC_COLOR if creating_body == 'Dynamic' else Body.STATIC_COLOR, 
             current_pos.toTuple(), 
             sqrt(mass))
     else:
+        # Reset position and velocity if not creating a body
         current_pos = Vector2(0, 0)
         current_vel = Vector2(0, 0)
 
@@ -144,17 +149,10 @@ while running:
 
                 # Get color
                 org_path_color = Body.STATIC_PATH_COLOR if path[1] else Body.DYNAMIC_PATH_COLOR
-                color = (
-                    constrain(dist * Body.path_color_multiplier * org_path_color[0], 0, 255), 
-                    constrain(dist * Body.path_color_multiplier * org_path_color[1], 0, 255), 
-                    constrain(dist * Body.path_color_multiplier * org_path_color[2], 0, 255))
+                color = [constrain(dist * Body.path_color_multiplier * c, 0, 255) for c in org_path_color]
 
                 # Render
-                pygame.draw.line(
-                    pygame.display.get_surface(), 
-                    color, 
-                    path[0][p].toTuple(),
-                    path[0][p-1].toTuple())
+                pygame.draw.line(pygame.display.get_surface(), color, path[0][p].toTuple(), path[0][p-1].toTuple())
 
     # Update & draw bodies
     total_path_pixels = 0
@@ -168,7 +166,7 @@ while running:
             if body != other:
                 # Attract
                 if (dynamic_attract_input.active) or (body.static):
-                    body.attract(other)
+                    body.attract(other, G)
                 # Collision
                 if (body.checkCollision(other)) and (can_collide_input.active):
                     # Remove the body with less mass

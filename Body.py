@@ -55,7 +55,7 @@ class Body:
         body.applyForce(force)
 
     def update(self, dt: float):
-        self.velocity += self.acc
+        self.velocity += self.acc * dt
         self.position += self.velocity * dt
         self.acc = Vector2(0, 0)
 
@@ -76,11 +76,8 @@ class Body:
 
                     # Get color
                     org_path_color = self.STATIC_PATH_COLOR if self.static else self.DYNAMIC_PATH_COLOR
-                    color = (
-                        constrain(dist * self.path_color_multiplier * org_path_color[0], 0, 255), 
-                        constrain(dist * self.path_color_multiplier * org_path_color[1], 0, 255), 
-                        constrain(dist * self.path_color_multiplier * org_path_color[2], 0, 255))
-
+                    color = [constrain(dist * self.path_color_multiplier * c, 0, 255) for c in org_path_color]
+                    
                     # Render
                     pygame.draw.line(
                         pygame.display.get_surface(), 
