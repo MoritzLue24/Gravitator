@@ -30,6 +30,6 @@ class Text(Widget):
         self.size = Vector2.fromTuple(self.font.size(self.text)) + TEXT_MARGIN * 2
 
         # Draw the text
-        pygame.draw.rect(surface, PASSIVE_COLOR, (self.topleft.x, self.topleft.y, self.size.x, self.size.y), 2)
+        pygame.draw.rect(surface, PASSIVE_COLOR, self.topleft.combineToList(self.size), 2)
         surface.blit(self.font.render(self.text, True, FONT_COLOR), (self.topleft + TEXT_MARGIN).toTuple())
         

@@ -29,7 +29,7 @@ class InputField(Widget):
         '''
         The event handler has to be called once inside the event loop.
         '''
-        rect = pygame.Rect(self.topleft.x, self.topleft.y, self.size.x, self.size.y)
+        rect = self.topleft.combineToList(self.size)
 
         # Reset the changed flag
         self.changed = False
@@ -77,8 +77,7 @@ class InputField(Widget):
 
         # Update the size
         self.size.x = self.font.size(self.description + ' ' + self.text)[0] + TEXT_MARGIN.x * 2
-
-        rect = pygame.Rect(self.topleft.x, self.topleft.y, self.size.x, self.size.y)
+        rect = self.topleft.combineToList(self.size)
 
         # Draw background
         pygame.draw.rect(surface, PASSIVE_COLOR, rect, 2)

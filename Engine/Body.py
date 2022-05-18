@@ -17,7 +17,6 @@ class Body:
         self.acceleration = Vector2(0, 0)
         self.mass = mass
         self.radius = radius
-
         self.path = []
 
 
@@ -28,7 +27,6 @@ class Body:
             f = force / self.mass
         except ZeroDivisionError:
             f = Vector2(0, 0)
-            
         self.acceleration += f
 
 

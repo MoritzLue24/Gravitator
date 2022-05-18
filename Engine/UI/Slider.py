@@ -30,7 +30,8 @@ class Slider(Widget):
         self.t = (self.value - self.min) / (self.max - self.min)
 
         # Calculate the hitbox rect of the slider and store it in self.rect 
-        self.slider_rect = pygame.Rect(self.topleft.x + slider_dist + self.size.x * self.t - self.HITBOX_SIZE / 2, self.topleft.y + self.size.y / 2 - self.HITBOX_SIZE / 2, self.HITBOX_SIZE, self.HITBOX_SIZE)
+        slider_topleft = Vector2(self.topleft.x + slider_dist + self.size.x * self.t, self.topleft.y + self.size.y / 2) - self.HITBOX_SIZE / 2
+        self.slider_rect = pygame.Rect(slider_topleft.combineToList(Vector2(self.HITBOX_SIZE, self.HITBOX_SIZE)))
 
         # Create the input field for the value of the slider and store it in self.input_field
         self.input_field = InputField(Vector2(self.topleft.x + self.size.x + slider_dist + input_dist, topleft.y), str(start_val))
@@ -62,8 +63,8 @@ class Slider(Widget):
 
         # Update the position of the slider rectangle
         self.t = (constrain(self.value, self.min, self.max) - self.min) / (self.max - self.min)
-        self.slider_rect = pygame.Rect(self.topleft.x + self.slider_dist + self.size.x * self.t - self.HITBOX_SIZE / 2, self.topleft.y + self.size.y / 2 - self.HITBOX_SIZE / 2, self.HITBOX_SIZE, self.HITBOX_SIZE)
-
+        slider_topleft = Vector2(self.topleft.x + self.slider_dist + self.size.x * self.t, self.topleft.y + self.size.y / 2) - self.HITBOX_SIZE / 2
+        self.slider_rect = pygame.Rect(slider_topleft.combineToList(Vector2(self.HITBOX_SIZE, self.HITBOX_SIZE)))
 
     def draw(self):
         '''
