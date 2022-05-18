@@ -11,11 +11,8 @@ Simulate the behavior of the gravitation between planets and stars.
 * Run with python ```python main.py```
 
 ## Controls
-* Press and hold left mouse button to create a dynamic body.
-* Press right mouse button to create a static body.
-* Press backspace to remove all bodies.
+* Press and hold left mouse button to create a body.
+* Press backspace to remove the last body.
+* Press c to remove all bodies.
 * Press escape to pause / continue.
-* Press q to exit.
- 
-## Example
-![Alt text](https://raw.githubusercontent.com/Monkvy/Gravitational-Attraction/main/Example.gif)
+
