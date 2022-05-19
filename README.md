@@ -7,8 +7,9 @@ Simulate the behavior of the gravitation between planets and stars.
 
 ## Usage
 * Install [python](https://www.python.org/downloads/)
+* Set up virtualenv, if you want to
 * Install pip packages with ```pip install -r requirements.txt```
-* Run with python ```python main.py```
+* Run with python ```python Gravitator```
 
 ## Controls
 * Press and hold left mouse button to create a body.
