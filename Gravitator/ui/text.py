@@ -1,7 +1,7 @@
 import pygame
 from VectorUtils import Vector2
-from ui.widget import Widget
-from ui.config import *
+from .widget import Widget
+from .config import *
 
 
 class Text(Widget):

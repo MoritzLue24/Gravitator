@@ -1,9 +1,10 @@
 import pygame
 from VectorUtils import *
 from config import *
-from ui.widget import Widget
-from ui.input_field import InputField
-from ui.config import *
+from .widget import Widget
+from .input_field import InputField
+from .config import *
+from config import constrain
 
 
 class Slider(Widget):

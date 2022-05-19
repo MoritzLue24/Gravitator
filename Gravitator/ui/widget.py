@@ -1,6 +1,5 @@
 import pygame
 from VectorUtils import Vector2
-from config import *
 
 
 class Widget:
