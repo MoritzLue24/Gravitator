@@ -1,9 +1,9 @@
 import pygame
 import sys
-from VectorUtils import Vector2
-from config import *
 import ui
+from VectorUtils import Vector2
 from body import Body
+from config import *
 
 
 class Window(pygame.Surface):
@@ -96,7 +96,6 @@ class Window(pygame.Surface):
 
         It is responsible for updating the display and handling events.
         '''
-
         while True:
             # Events
             for event in pygame.event.get():
