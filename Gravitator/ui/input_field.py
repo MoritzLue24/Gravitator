@@ -1,8 +1,8 @@
 import pygame
 from VectorUtils import Vector2
 from config import *
-from ui.widget import Widget
-from ui.config import *
+from .widget import Widget
+from .config import *
 
 
 class InputField(Widget):
