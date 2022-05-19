@@ -1,5 +1,5 @@
-# Gravitational-Attraction
-Simulate the behavior of the gravitation between planets and stars.
+# Gravitator
+Simulate the behavior of the gravitation between celestial objects.
 
 ## Requirements
 * pygame==2.1.2
