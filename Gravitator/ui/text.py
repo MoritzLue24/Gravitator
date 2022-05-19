@@ -1,7 +1,7 @@
 import pygame
 from VectorUtils import Vector2
 from .widget import Widget
-from .config import *
+import config as cfg
 
 
 class Text(Widget):
@@ -13,10 +13,10 @@ class Text(Widget):
         super().__init__(topleft)
 
         self.text = text
-        self.font = pygame.font.Font(FONT_PATH, FONT_SIZE)
+        self.font = pygame.font.Font(cfg.FONT_PATH, cfg.FONT_SIZE)
 
         # Calculate the size of the text surface and store it in self.size
-        self.size = Vector2.fromTuple(self.font.size(self.text)) + TEXT_MARGIN * 2
+        self.size = Vector2.fromTuple(self.font.size(self.text)) + cfg.TEXT_MARGIN * 2
 
 
     def draw(self):
@@ -27,9 +27,9 @@ class Text(Widget):
         surface = pygame.display.get_surface()
 
         # Update the size
-        self.size = Vector2.fromTuple(self.font.size(self.text)) + TEXT_MARGIN * 2
+        self.size = Vector2.fromTuple(self.font.size(self.text)) + cfg.TEXT_MARGIN * 2
 
         # Draw the text
-        pygame.draw.rect(surface, PASSIVE_COLOR, self.topleft.combineToList(self.size), 2)
-        surface.blit(self.font.render(self.text, True, FONT_COLOR), (self.topleft + TEXT_MARGIN).toTuple())
+        pygame.draw.rect(surface, cfg.PASSIVE_COLOR, self.topleft.combineToList(self.size), 2)
+        surface.blit(self.font.render(self.text, True, cfg.FONT_COLOR), (self.topleft + cfg.TEXT_MARGIN).toTuple())
         

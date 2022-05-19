@@ -1,4 +1,3 @@
-from ui.config import *
 from ui.checkbox import *
 from ui.input_field import *
 from ui.slider import *

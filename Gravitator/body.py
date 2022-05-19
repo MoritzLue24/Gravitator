@@ -72,13 +72,12 @@ class Body:
         Has to be called once per time step.
         '''
 
-        if draw_path:
-            # Remove the last point from the path if the path is too long
-            if len(self.path) >= path_length:
-                self.path = self.path[int(len(self.path)-path_length):]
+        # Remove the last point from the path if the path is too long
+        if len(self.path) >= path_length:
+            self.path = self.path[int(len(self.path)-path_length):]
 
-            # Add the current position to the path
-            self.path.append(self.position)
+        # Add the current position to the path
+        self.path.append(self.position)
 
         # Update the position of the body
         self.velocity += self.acceleration * delta_time

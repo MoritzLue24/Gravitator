@@ -3,7 +3,7 @@ import sys
 import ui
 from VectorUtils import Vector2
 from body import Body
-from config import *
+import config as cfg
 
 
 class Window(pygame.Surface):
@@ -17,7 +17,7 @@ class Window(pygame.Surface):
 
         # Initialize pygame
         pygame.init()
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.screen = pygame.display.set_mode((1536, 864))
         self.clock = pygame.time.Clock()
         self.delta_time = 0.0
 
@@ -64,7 +64,7 @@ class Window(pygame.Surface):
         for body in self.bodies:
             # Draw the body
             body.drawPath(self.screen, self.path_col_input.value)
-            pygame.draw.circle(self.screen, BODY_COLOR, body.position.toTuple(), body.radius)
+            pygame.draw.circle(self.screen, cfg.BODY_COLOR, body.position.toTuple(), body.radius)
             
             # Skip to the next body if the simulation is paused
             if self.paused:
@@ -83,11 +83,11 @@ class Window(pygame.Surface):
             self.current_body.velocity = self.current_body.position - Vector2.fromTuple(pygame.mouse.get_pos())
 
             # Draw a line from the current mouse position to the position of the body
-            pygame.draw.line(self.screen, INITIAL_VEL_COLOR, pygame.mouse.get_pos(), self.current_body.position.toTuple(), 1)
+            pygame.draw.line(self.screen, cfg.INITIAL_VEL_COLOR, pygame.mouse.get_pos(), self.current_body.position.toTuple(), 1)
 
         # Draw the current body
         if self.current_body:
-            pygame.draw.circle(self.screen, BODY_COLOR, self.current_body.position.toTuple(), self.current_body.radius)
+            pygame.draw.circle(self.screen, cfg.BODY_COLOR, self.current_body.position.toTuple(), self.current_body.radius)
 
 
     def run(self):
@@ -133,7 +133,7 @@ class Window(pygame.Surface):
                     self.current_body = None
 
             # Gray background
-            self.screen.fill(MAIN_BG_COLOR)
+            self.screen.fill(cfg.MAIN_BG_COLOR)
 
             # Bodies
             self.updateBodies()
@@ -147,12 +147,12 @@ class Window(pygame.Surface):
 
             # Draw the background for the user interface
             # The x size of the background is the highest x value of all input fields + offset
-            pygame.draw.rect(self.screen, pygame.Color(ui.BG), pygame.Rect(0, 0, max_x + 10, HEIGHT))
+            pygame.draw.rect(self.screen, pygame.Color(cfg.UI_BG), pygame.Rect(0, 0, max_x + 10, self.screen.get_height()))
             ui.Widget.draw_all()
 
             # Draw the paused / running icon
             img = pygame.transform.scale(pygame.image.load('assets/paused_icon.png' if self.paused else 'assets/running_icon.png').convert_alpha(), (32, 32))
-            self.screen.blit(img, (10, HEIGHT - img.get_width() - 10))
+            self.screen.blit(img, (10, self.screen.get_height() - img.get_width() - 10))
 
             # Update dt & display
             self.delta_time = 1/self.clock.get_fps() if self.clock.get_fps() != 0 else 0.0

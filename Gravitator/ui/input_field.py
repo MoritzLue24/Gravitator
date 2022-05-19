@@ -2,7 +2,7 @@ import pygame
 from VectorUtils import Vector2
 from config import *
 from .widget import Widget
-from .config import *
+import config as cfg
 
 
 class InputField(Widget):
@@ -14,7 +14,7 @@ class InputField(Widget):
         super().__init__(topleft)
 
         self.description = description
-        self.font = pygame.font.Font(FONT_PATH, FONT_SIZE)
+        self.font = pygame.font.Font(cfg.FONT_PATH, cfg.FONT_SIZE)
 
         # The text the user has entered
         self.text = text
@@ -23,7 +23,7 @@ class InputField(Widget):
         self.changed = False
 
         # Calculate the size of the text surface and store it in self.size
-        self.size = Vector2.fromTuple(self.font.size(self.description + ' ' + self.text)) + TEXT_MARGIN
+        self.size = Vector2.fromTuple(self.font.size(self.description + ' ' + self.text)) + cfg.TEXT_MARGIN
 
     def event_handler(self, event: pygame.event.Event) -> bool:
         '''
@@ -76,14 +76,14 @@ class InputField(Widget):
         surface = pygame.display.get_surface()
 
         # Update the size
-        self.size.x = self.font.size(self.description + ' ' + self.text)[0] + TEXT_MARGIN.x * 2
+        self.size.x = self.font.size(self.description + ' ' + self.text)[0] + cfg.TEXT_MARGIN.x * 2
         rect = self.topleft.combineToList(self.size)
 
         # Draw background
-        pygame.draw.rect(surface, PASSIVE_COLOR, rect, 2)
+        pygame.draw.rect(surface, cfg.PASSIVE_COLOR, rect, 2)
         if self.active:
-            pygame.draw.rect(surface, ACTIVE_COLOR, rect, 2)
+            pygame.draw.rect(surface, cfg.ACTIVE_COLOR, rect, 2)
 
         # Draw text
-        text = self.font.render(self.description + ' ' + self.text, True, FONT_COLOR)
-        surface.blit(text, (self.topleft + TEXT_MARGIN / 2).toTuple())
+        text = self.font.render(self.description + ' ' + self.text, True, cfg.FONT_COLOR)
+        surface.blit(text, (self.topleft + cfg.TEXT_MARGIN / 2).toTuple())

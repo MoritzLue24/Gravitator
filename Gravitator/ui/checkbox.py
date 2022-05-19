@@ -1,7 +1,6 @@
 import pygame
 from VectorUtils import Vector2
 from .widget import Widget
-from .config import *
 
 
 class Checkbox(Widget):

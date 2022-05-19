@@ -3,8 +3,7 @@ from VectorUtils import *
 from config import *
 from .widget import Widget
 from .input_field import InputField
-from .config import *
-from config import constrain
+import config as cfg
 
 
 class Slider(Widget):
@@ -25,7 +24,7 @@ class Slider(Widget):
         self.value = start_val
         self.description = description
         self.type = type
-        self.font = pygame.font.Font(FONT_PATH, FONT_SIZE)
+        self.font = pygame.font.Font(cfg.FONT_PATH, cfg.FONT_SIZE)
 
         # Calculate the percentage of the slider that is filled by the current value and store it in self.t 
         self.t = (self.value - self.min) / (self.max - self.min)
@@ -63,7 +62,7 @@ class Slider(Widget):
         self.input_field.text = str(round(self.value, 1))
 
         # Update the position of the slider rectangle
-        self.t = (constrain(self.value, self.min, self.max) - self.min) / (self.max - self.min)
+        self.t = (cfg.constrain(self.value, self.min, self.max) - self.min) / (self.max - self.min)
         slider_topleft = Vector2(self.topleft.x + self.slider_dist + self.size.x * self.t, self.topleft.y + self.size.y / 2) - self.HITBOX_SIZE / 2
         self.slider_rect = pygame.Rect(slider_topleft.combineToList(Vector2(self.HITBOX_SIZE, self.HITBOX_SIZE)))
 
@@ -73,7 +72,7 @@ class Slider(Widget):
         '''
         # Draw the description if there is one
         if self.description != '':
-            font_render = self.font.render(self.description, True, FONT_COLOR)
+            font_render = self.font.render(self.description, True, cfg.FONT_COLOR)
             pygame.display.get_surface().blit(font_render, self.topleft.toTuple())
 
         # Draw the slider line
@@ -81,7 +80,7 @@ class Slider(Widget):
         pygame.draw.line(pygame.display.get_surface(), (255, 255, 255), (self.topleft.x + self.slider_dist, middle_y - self.LINE_WIDTH / 2), (self.topleft.x + self.slider_dist + self.size.x, middle_y - self.LINE_WIDTH / 2), self.LINE_WIDTH)
 
         # Get the color for the slider
-        slider_color = ACTIVE_COLOR if self.active else PASSIVE_COLOR
+        slider_color = cfg.ACTIVE_COLOR if self.active else cfg.PASSIVE_COLOR
 
         # Draw the slider itself
         if self.type == 'square':
@@ -95,7 +94,7 @@ class Slider(Widget):
         # Update the position of the slider
         # (Inside draw() because it is called once per frame)
         if self.active:
-            self.slider_rect.centerx = constrain(pygame.mouse.get_pos()[0], self.topleft.x + self.slider_dist, self.topleft.x + self.slider_dist + self.size.x)
+            self.slider_rect.centerx = cfg.constrain(pygame.mouse.get_pos()[0], self.topleft.x + self.slider_dist, self.topleft.x + self.slider_dist + self.size.x)
             
             self.t = (self.slider_rect.centerx - (self.topleft.x + self.slider_dist)) / self.size.x
             self.value = self.min + (self.max - self.min) * self.t
