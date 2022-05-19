@@ -1,9 +1,9 @@
 import pygame
 from VectorUtils import *
 from config import *
-from Engine.UI.Widget import Widget
-from Engine.UI.InputField import InputField
-from Engine.UI.config import *
+from ui.widget import Widget
+from ui.input_field import InputField
+from ui.config import *
 
 
 class Slider(Widget):

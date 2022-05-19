@@ -1,7 +1,7 @@
 import pygame
 from VectorUtils import Vector2
-from Engine.UI.Widget import Widget
-from Engine.UI.config import *
+from ui.widget import Widget
+from ui.config import *
 
 
 class Checkbox(Widget):

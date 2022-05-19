@@ -1,8 +1,8 @@
 import pygame
 from VectorUtils import Vector2
 from config import *
-from Engine.UI.Widget import Widget
-from Engine.UI.config import *
+from ui.widget import Widget
+from ui.config import *
 
 
 class InputField(Widget):
@@ -29,7 +29,7 @@ class InputField(Widget):
         '''
         The event handler has to be called once inside the event loop.
         '''
-        rect = self.topleft.combineToList(self.size)
+        rect = pygame.Rect(self.topleft.combineToList(self.size))
 
         # Reset the changed flag
         self.changed = False

@@ -1,8 +1,9 @@
 import pygame
 import sys
 from VectorUtils import Vector2
-from Engine import *
 from config import *
+import ui
+from body import Body
 
 
 class Window(pygame.Surface):
@@ -26,12 +27,12 @@ class Window(pygame.Surface):
 
         # Initialize the user interface
         slider_x = 100
-        self.fps_text = UI.Text(Vector2(10, 10), 'FPS: 0.00')
-        self.mass_input = UI.Slider(Vector2(10, 50), slider_x, 8, Vector2(100, 20), 0.0, 10.0, 2.0, 'Mass  ')
-        self.radius_input = UI.Slider(Vector2(10, 90), slider_x, 8, Vector2(100, 20), 0.0, 10.0, 2.0, 'Radius')
-        self.g_input = UI.Slider(Vector2(10, 130), slider_x, 8, Vector2(100, 20), 0.0, 1000, 400, 'G ')
-        self.path_col_input = UI.Slider(Vector2(10, 170), slider_x, 8, Vector2(100, 20), 0.0, 1.0, 0.2, 'Path Color ')
-        self.path_length_input = UI.Slider(Vector2(10, 210), slider_x, 8, Vector2(100, 20), 0, 1000, 100, 'Path Length ')
+        self.fps_text = ui.Text(Vector2(10, 10), 'FPS: 0.00')
+        self.mass_input = ui.Slider(Vector2(10, 50), slider_x, 8, Vector2(100, 20), 0.0, 10.0, 2.0, 'Mass  ')
+        self.radius_input = ui.Slider(Vector2(10, 90), slider_x, 8, Vector2(100, 20), 0.0, 10.0, 2.0, 'Radius')
+        self.g_input = ui.Slider(Vector2(10, 130), slider_x, 8, Vector2(100, 20), 0.0, 1000, 400, 'G ')
+        self.path_col_input = ui.Slider(Vector2(10, 170), slider_x, 8, Vector2(100, 20), 0.0, 1.0, 0.2, 'Path Color ')
+        self.path_length_input = ui.Slider(Vector2(10, 210), slider_x, 8, Vector2(100, 20), 0, 1000, 100, 'Path Length ')
 
         # List to store all bodies
         self.bodies = []
@@ -103,11 +104,11 @@ class Window(pygame.Surface):
                     return
                 
                 # Continue the event loop if the user presses ontop of one widget so that the user cant click through the widget
-                if UI.Widget.events_all(event):
+                if ui.Widget.events_all(event):
                     continue
                 
                 # Continue the event loop if a widget is active
-                one_active = UI.Widget.oneActive()
+                one_active = ui.Widget.oneActive()
                 if one_active:
                     continue
                 
@@ -143,12 +144,12 @@ class Window(pygame.Surface):
 
             # Draw the user interface
             # Get the highest y value of all input fields widgets
-            max_x = max([widget.topleft.x + widget.size.x for widget in UI.Widget.instances if isinstance(widget, UI.InputField)])
+            max_x = max([widget.topleft.x + widget.size.x for widget in ui.Widget.instances if isinstance(widget, ui.InputField)])
 
             # Draw the background for the user interface
             # The x size of the background is the highest x value of all input fields + offset
-            pygame.draw.rect(self.screen, pygame.Color(UI.BG), pygame.Rect(0, 0, max_x + 10, HEIGHT))
-            UI.Widget.draw_all()
+            pygame.draw.rect(self.screen, pygame.Color(ui.BG), pygame.Rect(0, 0, max_x + 10, HEIGHT))
+            ui.Widget.draw_all()
 
             # Draw the paused / running icon
             img = pygame.transform.scale(pygame.image.load('assets/paused_icon.png' if self.paused else 'assets/running_icon.png').convert_alpha(), (32, 32))
