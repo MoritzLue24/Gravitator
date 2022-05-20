@@ -6,7 +6,7 @@ from body import Body
 import config as cfg
 
 
-class Window(pygame.Surface):
+class Window():
     def __init__(self):
         '''
         The Window class is responsible for creating the window,
