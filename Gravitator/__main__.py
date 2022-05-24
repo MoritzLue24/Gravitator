@@ -160,6 +160,9 @@ class Window():
             self.fps_text.text = 'FPS: ' + str(round(self.clock.get_fps(), 2))
             self.clock.tick(60)
 
+            # Display current number of bodies
+            pygame.display.set_caption('Gravitator - ' + str(len(self.bodies)) + ' bodies')
+
 
 if __name__ == '__main__':
     # Create the window
