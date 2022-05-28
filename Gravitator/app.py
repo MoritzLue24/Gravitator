@@ -79,6 +79,7 @@ class Application:
             for other in self.bodies:
                 if body != other:
                     body.attract(other, self.g)
+
             body.update(self.delta_time)
 
         # Update the initial velocity of the body based on the mouse position if the user is creating a body
