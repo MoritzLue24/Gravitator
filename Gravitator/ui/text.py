@@ -1,35 +1,39 @@
 import pygame
 from VectorUtils import Vector2
 from .widget import Widget
-import config as cfg
+from .font import Font
 
 
 class Text(Widget):
-    def __init__(self, topleft: Vector2, text: str):
+    def __init__(self, **kwargs):
         '''
-        This class is used to display text on the screen.
-        It is recommended to create an instance of this class only inside the ui class
+        Used to display simple text on a surface.
+
+        Kw Args:
+            * topleft (Vector2, optional=None) - If None, topleft is calculated using the DEFAULT_X and DEFAULT_Y_SPACING properties.
+            * text (str) - The text to be displayed.
+            * underlined (bool, optional=True) - If True, underlines the text.
         '''
-        super().__init__(topleft)
 
-        self.text = text
-        self.font = pygame.font.Font(cfg.FONT_PATH, cfg.FONT_SIZE)
+        super().__init__(kwargs.get('topleft', None))
+        self.text = kwargs.get('text')
+        self.underlined = kwargs.get('underlined', True)
 
-        # Calculate the size of the text surface and store it in self.size
-        self.size = Vector2.fromTuple(self.font.size(self.text)) + cfg.TEXT_MARGIN * 2
-
-
-    def draw(self):
+    
+    def render(self):
         '''
-        This method is called once per frame.
-        It loops through all instances and calls the draw method.
+        Render the text using the static ui.Font.render method.
         '''
-        surface = pygame.display.get_surface()
 
-        # Update the size
-        self.size = Vector2.fromTuple(self.font.size(self.text)) + cfg.TEXT_MARGIN * 2
+        #rect = (self.topleft + Vector2(self.surface.x, self.surface.y)).combineToList(Font.getRenderSize(self.text) + Widget.TEXT_MARGIN * 2)
+        #renderer.draw_rect(rect, Widget.ACTIVE_COLOR if self.active else Widget.PASSIVE_COLOR)
 
-        # Draw the text
-        pygame.draw.rect(surface, cfg.PASSIVE_COLOR, self.topleft.combineToList(self.size), 2)
-        surface.blit(self.font.render(self.text, True, cfg.FONT_COLOR), (self.topleft + cfg.TEXT_MARGIN).toTuple())
-        
+        # Render the text
+        Font.myRender(self.surface, self.text, self.topleft + Widget.TEXT_MARGIN)
+
+        # Render underline if widget.underlined
+        if self.underlined:
+            height = Font.getRenderSize(self.text).y + Widget.TEXT_MARGIN * 2
+            a = Vector2(self.topleft.x, self.topleft.y + height)
+            b = self.topleft + Vector2(self.surface.size.x - self.topleft.x * 2, height)
+            pygame.draw.line(self.surface, (255, 255, 255), a.toTuple(), b.toTuple())

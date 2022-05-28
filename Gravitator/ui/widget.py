@@ -1,51 +1,54 @@
 import pygame
 from VectorUtils import Vector2
+from .font import Font
 
 
 class Widget:
     instances = []
-    def __init__(self, topleft: Vector2):
+    TEXT_MARGIN = 5
+    ACTIVE_COLOR = (150, 150, 150)
+    PASSIVE_COLOR = (45, 75, 123)
+    DEFAULT_X = 10
+    DEFAULT_Y_SPACING = 10
+    
+    def __init__(self, topleft: Vector2 | None):
         '''
-        This is a base class for all widgets.
-        Do not use this class directly but the static methods can be called.
+        The widget class is the base class for all widgets.
+
+        Args:
+            * topleft (Vector2, optional=None) - If None, topleft is calculated using the DEFAULT_X and DEFAULT_Y_SPACING properties.
         '''
-        self.topleft = topleft
+
+        # Get the topleft position
+        if topleft != None:
+            self.topleft = topleft
+        else:
+            self.topleft = Vector2(Widget.DEFAULT_X, Widget.DEFAULT_Y_SPACING + len(Widget.instances) * (Widget.DEFAULT_Y_SPACING + Font.getRenderSize('a').y + Widget.TEXT_MARGIN * 2))
+
+        self.surface = None
         self.active = False
+
         Widget.instances.append(self)
-
-    def event_handler(self, event: pygame.event.Event) -> bool:
-        return False
-
+    
+    
     @staticmethod
     def oneActive() -> bool:
         '''
-        Returns True if there is at least one widget active.
+        Return True if there is atleast one widget active.
         '''
-        for instance in Widget.instances:
-            if instance.active:
-                return True
+        return any(widget.active for widget in Widget.instances)
+
+
+    def handleEvents(self, event: pygame.event.Event) -> bool:
+        '''
+        Handle the events of a widget.
+        This function returns True if the event was handled, False otherwise.
+        '''
         return False
 
 
-    @staticmethod
-    def events_all(event: pygame.event.Event) -> bool:
+    def render(self):
         '''
-        The event handler has to be called once inside the event loop.
+        Render the widget. The offset is the topleft position of parent surface.
         '''
-        # Events for the InputFields
-        smth_clicked = False
-
-        for instance in Widget.instances:
-            if instance.event_handler(event):
-                smth_clicked = True
-
-        return smth_clicked
-
-
-    @staticmethod
-    def draw_all():
-        '''
-        Draws every widget.
-        '''
-        for instance in Widget.instances:
-            instance.draw()
+        pass

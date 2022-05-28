@@ -1,46 +1,56 @@
 import pygame
 from VectorUtils import Vector2
-from config import *
 from .widget import Widget
-import config as cfg
+from .font import Font
 
 
 class InputField(Widget):
-    def __init__(self, topleft: Vector2, text: str, description: str=''):
+    def __init__(self, **kwargs):
         '''
-        This class is used to take input from the user.
-        It is recommended to create an instance of this class only inside the ui class
+        Used to display an interactive text input field.
+
+        Kw Args:
+            * topleft (Vector2, optional=None) - If None, topleft is calculated using the DEFAULT_X and DEFAULT_Y_SPACING properties.
+            * description (str, optional=None) - The description.
+            * text (str) - The default text that can be edited.
+            * min_width (int, optional=0) - The minimum width of the input (not description) field.
         '''
-        super().__init__(topleft)
 
-        self.description = description
-        self.font = pygame.font.Font(cfg.FONT_PATH, cfg.FONT_SIZE)
+        super().__init__(kwargs.get('topleft', None))
+        self.description = kwargs.get('description', None)
+        self.text = kwargs.get('text')
+        self.min_width = kwargs.get('min_width', 0)
 
-        # The text the user has entered
-        self.text = text
-        
         # A flag that indicates if the user has deselected the text field
         self.changed = False
 
-        # Calculate the size of the text surface and store it in self.size
-        self.size = Vector2.fromTuple(self.font.size(self.description + ' ' + self.text)) + cfg.TEXT_MARGIN
+        # Calculate the size of the boxes of both the description and the input text
+        self.desc_size = Font.getRenderSize(self.description) + Widget.TEXT_MARGIN * 2
+        text_size = Font.getRenderSize(self.text) + Widget.TEXT_MARGIN * 2
+        self.text_size = text_size if text_size.x >= self.min_width else Vector2(self.min_width, text_size.y)
 
-    def event_handler(self, event: pygame.event.Event) -> bool:
+
+    def handleEvents(self, event: pygame.event.Event) -> bool:
         '''
-        The event handler has to be called once inside the event loop.
+        Handle the events of the input field.
+        This function returns True if the event was handled, False otherwise.
         '''
-        rect = pygame.Rect(self.topleft.combineToList(self.size))
+        
+        text_rect = pygame.Rect(
+            self.surface.vertical_seperator + self.surface.topleft.x if self.description else self.topleft.x, 
+            self.topleft.y + self.surface.topleft.y, 
+            self.text_size.x, 
+            self.text_size.y
+        )
 
         # Reset the changed flag
         self.changed = False
 
-        # Set instance.highlighted to True if the user has clicked on the text field and False otherwise
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if rect.collidepoint(pygame.mouse.get_pos()):
+        # Set instance.active to True if the user has clicked on the text field and False otherwise
+        if (event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 1):
+            if text_rect.collidepoint(pygame.mouse.get_pos()):
                 # Set the changed flag to True if the user has deselected the text field
-                if self.active:
-                    self.changed = True
-
+                self.changed = True
                 self.active = not self.active
                 return True
 
@@ -50,40 +60,49 @@ class InputField(Widget):
                     self.active = False
                     return True
 
-        # Set the input field to inactive if the user has clicked enter
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-            if not self.active: pass
-            
-            self.active = False
-            self.changed = True
-            return True
+        # Handle the keyboard events
+        if event.type == pygame.KEYDOWN and self.active:
+            if event.key == pygame.K_RETURN:
+                self.active = False
+                self.changed = True
 
-        # If the user has highlighted the text field, add the typed character to the text field
-        elif event.type == pygame.KEYDOWN and self.active:
-            if event.key == pygame.K_BACKSPACE:
+            elif event.key == pygame.K_BACKSPACE:
                 self.text = self.text[:-1]
             else:
                 self.text += event.unicode
+            
+            # Update the text size
+            text_size = Font.getRenderSize(self.text) + Widget.TEXT_MARGIN * 2
+            self.text_size = text_size if text_size.x >= self.min_width else Vector2(self.min_width, text_size.y)
             return True
 
         return False
 
-    
-    def draw(self):
+
+    def render(self, surface: pygame.Surface=None):
         '''
-        The draw method has to be called once per frame.
+        Render the text input field.
         '''
-        surface = pygame.display.get_surface()
+        
+        # Calculate the description rect and the text rect
+        text_rect = pygame.Rect(
+            self.surface.vertical_seperator if self.description else self.topleft.x, 
+            self.topleft.y, 
+            self.text_size.x, 
+            self.text_size.y
+        )
 
-        # Update the size
-        self.size.x = self.font.size(self.description + ' ' + self.text)[0] + cfg.TEXT_MARGIN.x * 2
-        rect = self.topleft.combineToList(self.size)
+        # Render the background
+        # renderer.fill(desc_rect, sdl2.ext.Color(255, 20, 20))
+        # renderer.fill(text_rect, sdl2.ext.Color(20, 20, 255))
 
-        # Draw background
-        pygame.draw.rect(surface, cfg.PASSIVE_COLOR, rect, 2)
-        if self.active:
-            pygame.draw.rect(surface, cfg.ACTIVE_COLOR, rect, 2)
+        surf = self.surface if self.surface else surface
 
-        # Draw text
-        text = self.font.render(self.description + ' ' + self.text, True, cfg.FONT_COLOR)
-        surface.blit(text, (self.topleft + cfg.TEXT_MARGIN / 2).toTuple())
+        pygame.draw.rect(surf, Widget.ACTIVE_COLOR if self.active else Widget.PASSIVE_COLOR, text_rect, 2)
+
+
+        # Render the description
+        Font.myRender(surf, self.description, self.topleft + Widget.TEXT_MARGIN)
+
+        # Render the default text
+        Font.myRender(surf, self.text, Vector2(text_rect[0], text_rect[1]) + Widget.TEXT_MARGIN)
