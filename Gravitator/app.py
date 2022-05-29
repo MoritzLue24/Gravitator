@@ -2,7 +2,7 @@ import pygame
 import tkinter as tk
 import ui
 from tkinter import filedialog, messagebox
-from VectorUtils import Vector2
+from VectorUtils import Vector2, Vector
 from utils import constrain
 from body import Body
 
@@ -108,7 +108,7 @@ class Application:
         except ValueError:
             return None
 
-        return Body(Vector2.fromTuple(pygame.mouse.get_pos()), Vector2(0, 0), mass, radius)
+        return Body(Vector(pygame.mouse.get_pos()), Vector2(0, 0), mass, radius)
 
 
     def handleBodies(self):
@@ -137,7 +137,7 @@ class Application:
 
         # Update the initial velocity of the body based on the mouse position if the user is creating a body
         if self.current_body:
-            mouse_pos = Vector2.fromTuple(pygame.mouse.get_pos())
+            mouse_pos = Vector(pygame.mouse.get_pos())
 
             self.current_body.velocity = self.current_body.position - mouse_pos
 
@@ -176,7 +176,7 @@ class Application:
                         self.current_body = self.createBody()
                     elif event.button == 3:
                         for body in self.bodies:
-                            if body.position.getDist(Vector2.fromTuple(pygame.mouse.get_pos())) < body.radius + 10:
+                            if body.position.getDist(Vector(pygame.mouse.get_pos())) < body.radius + 10:
                                 self.dragged_body = body
                                 break
 
@@ -199,7 +199,7 @@ class Application:
                 
             # Update the dragged body's position & color
             if self.dragged_body:
-                self.dragged_body.position = Vector2.fromTuple(pygame.mouse.get_pos())
+                self.dragged_body.position = Vector(pygame.mouse.get_pos())
                 self.dragged_body.velocity = Vector2(0, 0)
                 self.dragged_body.color = (10, 200, 10)
 
