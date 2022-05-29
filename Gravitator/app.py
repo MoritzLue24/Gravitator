@@ -3,6 +3,7 @@ import tkinter as tk
 import ui
 from tkinter import filedialog, messagebox
 from VectorUtils import Vector2
+from utils import constrain
 from body import Body
 
 
@@ -40,25 +41,42 @@ class Application:
         self.current_body = None
         self.dragged_body = None
 
-        # UI
+        # Initialize the font
         ui.Font('assets/Fonts/Roboto-Regular.ttf', 16, (225, 225, 225))
-        self.config_surf = ui.Surface(Vector2(0, 0), Vector2(270, height), 170)
-        self.fps_text = self.config_surf.addWidget(ui.Text(text='FPS: 0.0'))
-        self.run_button = self.config_surf.addWidget(ui.Button(
-            topleft=Vector2(self.config_surf.topleft.x + 10, self.config_surf.topleft.y + self.config_surf.size.y - (ui.Font.getRenderSize('a').y + 40)  - 10),
-            description='Run Script', 
-            on_click=self.runScript, 
-            margin=Vector2(20, 20)
-        ))
 
-        # Inputs
-        self.mass_input = self.config_surf.addWidget(ui.InputField(description='Mass:', text='2.0', min_width=90))
-        self.radius_input = self.config_surf.addWidget(ui.InputField(description='Radius:', text='4', min_width=90))
-        self.g_input = self.config_surf.addWidget(ui.InputField(description='G:', text='400.0', min_width=90))
-        self.path_length_input = self.config_surf.addWidget(ui.InputField(description='Path length:', text='0', min_width=90))
-        self.path_color_multiplier_input = self.config_surf.addWidget(ui.InputField(description='Path color multiplier:', text='0.5', min_width=90))
-        self.draw_lines_input = self.config_surf.addWidget(ui.Checkbox(description='Draw lines:', checked=True))
-        self.bg_alpha_input = self.config_surf.addWidget(ui.InputField(description='Background alpha:', text='0.1', min_width=90))
+        script_surf_height = 110 + ui.Font.getRenderSize('a').y
+
+        # Config surface
+        self.config_surf = ui.Surface(Vector2(0, 0), Vector2(270, height - script_surf_height), 170)
+        self.fps_text = ui.Text(surface=self.config_surf, text='FPS: 0.0')
+        self.mass_input = ui.InputField(surface=self.config_surf, description='Mass:', text='2.0', min_width=90)
+        self.radius_input = ui.InputField(surface=self.config_surf, description='Radius:', text='4', min_width=90)
+        self.g_input = ui.InputField(surface=self.config_surf, description='G:', text='400.0', min_width=90)
+        self.path_length_input = ui.InputField(surface=self.config_surf, description='Path length:', text='0', min_width=90)
+        self.path_color_multiplier_input = ui.InputField(surface=self.config_surf, description='Path color multiplier:', text='0.5', min_width=90)
+        self.draw_lines_input = ui.Checkbox(surface=self.config_surf, description='Draw lines:', checked=True)
+        self.bg_alpha_input = ui.InputField(surface=self.config_surf, description='Background alpha:', text='5', min_width=90)
+
+        # Script surface
+        self.current_script = None
+        self.script_surf = ui.Surface(Vector2(0, height - script_surf_height), Vector2(270, script_surf_height), 170)
+        self.current_script_text = ui.Text(surface=self.script_surf, text='Current script: None')
+        self.run_btn = ui.Button(surface=self.script_surf, size=Vector2(270 - 20, 30), description='Run Script', on_click=self.runScript)
+        self.select_script_btn = ui.Button(surface=self.script_surf, size=Vector2(270 - 20, 30), description='Select Script', on_click=self.selectScript)
+
+
+    def selectScript(self):
+        '''
+        This function is called when the user presses the select script button.
+        The user will be prompted to select a script and the bodies will be cleared.
+        '''
+
+        self.bodies = []
+
+        root = tk.Tk()
+        root.withdraw()
+        self.current_script = filedialog.askopenfilename(initialdir='.', title='Select a file', filetypes=(('Python files', '*.py'), ('all files', '*.*')))
+        self.current_script_text.text = 'Current script: ' + self.current_script.split('/')[-1]
 
 
     def runScript(self):
@@ -67,20 +85,15 @@ class Application:
         It will run the script and add the bodies to the simulation.
         '''
 
-        # Clear the simulation
-        self.bodies.clear()
-
-        # Get the file path of a file with a dialog
-        root = tk.Tk()
-        root.withdraw()
-        file_path = filedialog.askopenfilename(initialdir='.', title='Select a file', filetypes=(('Python files', '*.py'), ('all files', '*.*')))
-
-        # Run the script
-        with open(file_path, 'r') as f:
-            try:
-                exec(f.read())
-            except Exception as e:
-                messagebox.showerror('Error', 'An error occured while running the script:\n{}'.format(e))
+        try:
+            with open(self.current_script, 'r') as f:
+                try:
+                    self.bodies.clear()
+                    exec(f.read())
+                except Exception as e:
+                    messagebox.showerror('Error', 'An error occured while running the script:\n{}'.format(e))
+        except FileNotFoundError:
+            pass
 
 
     def createBody(self):
@@ -145,7 +158,7 @@ class Application:
                     self.running = False
 
                 # Handle ui events
-                if ui.Surface.handleEvents(event) or ui.Widget.oneActive():
+                if self.config_surf.handleEvents(event) or ui.Widget.oneActive():
                     continue
                 
                 # If the user presses the escape key, the physics will be paused
@@ -193,11 +206,11 @@ class Application:
 
             # Clear the screen
             try:
-                bg_alpha = float(self.bg_alpha_input.text)
+                bg_alpha = float(self.bg_alpha_input.text) * self.delta_time
             except ValueError:
                 bg_alpha = 1
             bg_img = pygame.Surface((self.screen.get_width(), self.screen.get_height()), pygame.SRCALPHA)
-            pygame.draw.rect(bg_img, (0, 0, 0, 255 * bg_alpha), bg_img.get_rect())
+            pygame.draw.rect(bg_img, (0, 0, 0, constrain(255 * bg_alpha, 0, 255)), bg_img.get_rect())
             self.screen.blit(bg_img, (0, 0))
 
             # Draw & update the bodies
@@ -205,9 +218,11 @@ class Application:
 
             # Display the ui
             self.config_surf.draw()
+            self.script_surf.draw()
 
             # Draw & delta time
             pygame.display.flip()
+            pygame.display.set_caption(f'Gravitator | {len(self.bodies)} bodie(s)')
             self.delta_time = self.clock.tick(60) / 1000.0
             self.fps_text.text = f'FPS: {str(round(1 / self.delta_time, 1))}  |  {"Paused" if self.paused else "Running"}'
             

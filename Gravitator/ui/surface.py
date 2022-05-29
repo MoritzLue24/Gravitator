@@ -1,8 +1,6 @@
 import pygame
 from VectorUtils import Vector2
 from .widget import Widget
-from .font import Font
-from .text import Text
 
 
 class Surface(pygame.Surface):
@@ -30,15 +28,6 @@ class Surface(pygame.Surface):
         self.widgets = []
 
         Surface.instances.append(self)
-
-    
-    def addWidget(self, widget: Widget) -> Widget:
-        '''
-        Add a widget to the surface. Returns the widget
-        '''
-        widget.surface = self
-        self.widgets.append(widget)
-        return widget
 
     
     @staticmethod

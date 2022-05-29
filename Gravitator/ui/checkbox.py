@@ -9,12 +9,13 @@ class Checkbox(Widget):
         A input widget with a checked value of true or false
 
         Kw Args:
+            * surface (Surface) - The parent surface.
             * topleft (Vector2, optional=None) - If None, topleft is calculated using the DEFAULT_X and DEFAULT_Y_SPACING properties.
             * description (str) - The description.
             * checked (bool, optional=False) - If True, the checkbox is checked.
         '''
 
-        super().__init__(kwargs.get('topleft', None))
+        super().__init__(kwargs.get('surface'), kwargs.get('topleft', None))
         self.description = kwargs.get('description')
         self.checked = kwargs.get('checked', False)
     
@@ -24,10 +25,11 @@ class Checkbox(Widget):
         Handle the events of the checkbox.
         This function returns True if the event was handled, False otherwise.
         '''
-        box_size = Font.getRenderSize('a').y + Widget.TEXT_MARGIN * 2
+        box_size = Font.getRenderSize('a').y + Widget.MARGIN * 2
+        rect = pygame.Rect(self.surface.topleft.x + self.surface.vertical_seperator, self.surface.topleft.y + self.topleft.y, box_size, box_size)
 
         if (event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 1):
-            if pygame.Rect(self.surface.vertical_seperator, self.topleft.y, box_size, box_size).collidepoint(pygame.mouse.get_pos()):
+            if rect.collidepoint(pygame.mouse.get_pos()):
                 self.checked = not self.checked
                 return True
         return False
@@ -39,9 +41,9 @@ class Checkbox(Widget):
         '''
         
         # Draw the description
-        Font.draw(self.surface, self.description, self.topleft + Widget.TEXT_MARGIN)
+        self.surface.blit(Font.get().render(self.description, True, Font.get().color), (self.topleft + Widget.MARGIN).toTuple())
 
-        box_size = Font.getRenderSize('a').y + Widget.TEXT_MARGIN * 2
+        box_size = Font.getRenderSize('a').y + Widget.MARGIN * 2
 
         # Draw a cross if the checkbox is checked
         if self.checked:

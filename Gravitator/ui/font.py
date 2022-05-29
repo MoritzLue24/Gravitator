@@ -38,16 +38,3 @@ class Font(pygame.font.Font):
 
         # Return the result
         return Vector2(surface.get_width(), surface.get_height())
-
-
-    @staticmethod
-    def draw(surface: pygame.Surface, text: str, topleft: Vector2):
-        '''
-        Render the text on the surface.
-        '''
-        
-        # Get the text surface
-        text_surf = Font.get().render(text, True, Font.get().color)
-        
-        # Render the text
-        surface.blit(text_surf, topleft.toTuple())

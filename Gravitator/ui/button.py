@@ -11,16 +11,17 @@ class Button(Widget):
         A button widget.
 
         Kw Args:
+            * surface (Surface) - The parent surface.
             * topleft (Vector2, optional=None) - If None, topleft is calculated using the DEFAULT_X and DEFAULT_Y_SPACING properties.
+            * size (Vector2, optional=None) - If None, size is calculated using the Widget.MARGIN and text size.
             * description (str) - The description.
             * on_click (function) - The function to call when the button is clicked.
-            * margin (Vector2, optional=Widget.TEXT_MARGIN) - The margin between the button and the description.
         '''
 
-        super().__init__(kwargs.get('topleft', None))
+        super().__init__(kwargs.get('surface'), kwargs.get('topleft', None))
+        self.size = kwargs.get('size', None)
         self.description = kwargs.get('description')
         self.on_click = kwargs.get('on_click')
-        self.margin = kwargs.get('margin', Vector2(Widget.TEXT_MARGIN, Widget.TEXT_MARGIN))
         self._clicked_time = None
 
 
@@ -29,8 +30,8 @@ class Button(Widget):
         Handle the events of the button.
         This function returns True if the event was handled, False otherwise.
         '''
-        rect = pygame.Rect(self.topleft.toTuple(), (Font.getRenderSize(self.description) + self.margin * 2).toTuple())
-
+        rect = pygame.Rect((self.surface.topleft + self.topleft).toTuple(), self.size.toTuple())
+        
         if (event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 1):
             if rect.collidepoint(pygame.mouse.get_pos()):
                 self._clicked_time = pygame.time.get_ticks()
@@ -51,9 +52,10 @@ class Button(Widget):
                 self._clicked_time = None
                 self.active = False
 
-        # Draw the description
-        Font.draw(self.surface, self.description, self.topleft + self.margin)
+        # Draw the description so it is always in the middle of the button
+        font_surface = Font.get().render(self.description, True, Font.get().color)
+        font_size = Vector2(font_surface.get_width(), font_surface.get_height())
+        self.surface.blit(font_surface, (self.topleft + (self.size - font_size) / 2).toTuple())
 
         # Draw the button
-        pygame.draw.rect(self.surface, Widget.ACTIVE_COLOR if self.active else Widget.PASSIVE_COLOR, 
-            pygame.Rect(self.topleft.toTuple(), (Font.getRenderSize(self.description) + self.margin * 2).toTuple()), 2)
+        pygame.draw.rect(self.surface, Widget.ACTIVE_COLOR if self.active else Widget.PASSIVE_COLOR, self.topleft.combineToList(self.size), 2)

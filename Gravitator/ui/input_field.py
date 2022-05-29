@@ -10,13 +10,14 @@ class InputField(Widget):
         Used to display an interactive text input field.
 
         Kw Args:
+            * surface (Surface) - The parent surface.
             * topleft (Vector2, optional=None) - If None, topleft is calculated using the DEFAULT_X and DEFAULT_Y_SPACING properties.
             * description (str, optional=None) - The description.
             * text (str) - The default text that can be edited.
             * min_width (int, optional=0) - The minimum width of the input (not description) field.
         '''
 
-        super().__init__(kwargs.get('topleft', None))
+        super().__init__(kwargs.get('surface'), kwargs.get('topleft', None))
         self.description = kwargs.get('description', None)
         self.text = kwargs.get('text')
         self.min_width = kwargs.get('min_width', 0)
@@ -25,8 +26,8 @@ class InputField(Widget):
         self.changed = False
 
         # Calculate the size of the boxes of both the description and the input text
-        self.desc_size = Font.getRenderSize(self.description) + Widget.TEXT_MARGIN * 2
-        text_size = Font.getRenderSize(self.text) + Widget.TEXT_MARGIN * 2
+        self.desc_size = Font.getRenderSize(self.description) + Widget.MARGIN * 2
+        text_size = Font.getRenderSize(self.text) + Widget.MARGIN * 2
         self.text_size = text_size if text_size.x >= self.min_width else Vector2(self.min_width, text_size.y)
 
 
@@ -72,7 +73,7 @@ class InputField(Widget):
                 self.text += event.unicode
             
             # Update the text size
-            text_size = Font.getRenderSize(self.text) + Widget.TEXT_MARGIN * 2
+            text_size = Font.getRenderSize(self.text) + Widget.MARGIN * 2
             self.text_size = text_size if text_size.x >= self.min_width else Vector2(self.min_width, text_size.y)
             return True
 
@@ -98,7 +99,7 @@ class InputField(Widget):
 
 
         # Render the description
-        Font.draw(surf, self.description, self.topleft + Widget.TEXT_MARGIN)
+        self.surface.blit(Font.get().render(self.description, True, Font.get().color), (self.topleft + Widget.MARGIN).toTuple())
 
         # Render the default text
-        Font.draw(surf, self.text, Vector2(text_rect[0], text_rect[1]) + Widget.TEXT_MARGIN)
+        self.surface.blit(Font.get().render(self.text, True, Font.get().color), (text_rect[0] + Widget.MARGIN, text_rect[1] + Widget.MARGIN))
