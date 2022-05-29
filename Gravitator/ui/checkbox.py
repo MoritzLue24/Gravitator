@@ -1,5 +1,4 @@
 import pygame
-from VectorUtils import Vector2
 from .widget import Widget
 from .font import Font
 

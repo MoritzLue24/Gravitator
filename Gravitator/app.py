@@ -1,5 +1,7 @@
 import pygame
+import tkinter as tk
 import ui
+from tkinter import filedialog, messagebox
 from VectorUtils import Vector2
 from body import Body
 
@@ -42,6 +44,14 @@ class Application:
         ui.Font('assets/Fonts/Roboto-Regular.ttf', 16, (225, 225, 225))
         self.config_surf = ui.Surface(Vector2(0, 0), Vector2(270, height), 170)
         self.fps_text = self.config_surf.addWidget(ui.Text(text='FPS: 0.0'))
+        self.run_button = self.config_surf.addWidget(ui.Button(
+            topleft=Vector2(self.config_surf.topleft.x + 10, self.config_surf.topleft.y + self.config_surf.size.y - (ui.Font.getRenderSize('a').y + 40)  - 10),
+            description='Run Script', 
+            on_click=self.runScript, 
+            margin=Vector2(20, 20)
+        ))
+
+        # Inputs
         self.mass_input = self.config_surf.addWidget(ui.InputField(description='Mass:', text='2.0', min_width=90))
         self.radius_input = self.config_surf.addWidget(ui.InputField(description='Radius:', text='4', min_width=90))
         self.g_input = self.config_surf.addWidget(ui.InputField(description='G:', text='400.0', min_width=90))
@@ -49,6 +59,28 @@ class Application:
         self.path_color_multiplier_input = self.config_surf.addWidget(ui.InputField(description='Path color multiplier:', text='0.5', min_width=90))
         self.draw_lines_input = self.config_surf.addWidget(ui.Checkbox(description='Draw lines:', checked=True))
         self.bg_alpha_input = self.config_surf.addWidget(ui.InputField(description='Background alpha:', text='0.1', min_width=90))
+
+
+    def runScript(self):
+        '''
+        This function is called when the user presses the run button.
+        It will run the script and add the bodies to the simulation.
+        '''
+
+        # Clear the simulation
+        self.bodies.clear()
+
+        # Get the file path of a file with a dialog
+        root = tk.Tk()
+        root.withdraw()
+        file_path = filedialog.askopenfilename(initialdir='.', title='Select a file', filetypes=(('Python files', '*.py'), ('all files', '*.*')))
+
+        # Run the script
+        with open(file_path, 'r') as f:
+            try:
+                exec(f.read())
+            except Exception as e:
+                messagebox.showerror('Error', 'An error occured while running the script:\n{}'.format(e))
 
 
     def createBody(self):
@@ -174,14 +206,10 @@ class Application:
             # Display the ui
             self.config_surf.draw()
 
-            # Draw the pause / unpause image on the bottom left
-            img = pygame.transform.scale(pygame.image.load(f'assets/{"paused" if self.paused else "running"}_icon.png'), (32, 32))
-            self.screen.blit(img, (5, self.screen.get_height() - 37))
-
             # Draw & delta time
             pygame.display.flip()
             self.delta_time = self.clock.tick(60) / 1000.0
-            self.fps_text.text = 'FPS: ' + str(round(1 / self.delta_time, 1))
+            self.fps_text.text = f'FPS: {str(round(1 / self.delta_time, 1))}  |  {"Paused" if self.paused else "Running"}'
             
 
         # Cleanup
