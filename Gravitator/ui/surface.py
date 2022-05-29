@@ -34,14 +34,13 @@ class Surface(pygame.Surface):
 
         event_handled = False
 
-        # Handle events for all widgets
+        # Handle events for all widgets & surfaces
         for surface in Surface.instances:
             for widget in surface.widgets:
                 if widget.handleEvents(event):
                     event_handled = True
             if pygame.Rect(surface.topleft.combineToList(surface.size)).collidepoint(pygame.mouse.get_pos()) and Surface.CAN_CLICK_THROUGH:
                 event_handled = True
-        
         return event_handled
 
 
@@ -50,10 +49,7 @@ class Surface(pygame.Surface):
         Draw all widgets and the surface
         '''
 
-        # draw the background rect
         self.fill(self.bg_color)
-
-        # draw all widgets
         for widget in self.widgets:
             widget.draw()
 
