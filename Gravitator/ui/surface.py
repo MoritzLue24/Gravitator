@@ -1,6 +1,5 @@
 import pygame
 from VectorUtils import Vector2
-from .widget import Widget
 
 
 class Surface(pygame.Surface):
