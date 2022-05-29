@@ -44,8 +44,10 @@ class Application:
         self.mass_input = self.config_surf.addWidget(ui.InputField(description='Mass:', text='2.0', min_width=90))
         self.radius_input = self.config_surf.addWidget(ui.InputField(description='Radius:', text='4', min_width=90))
         self.g_input = self.config_surf.addWidget(ui.InputField(description='G:', text='400.0', min_width=90))
-        self.path_length_input = self.config_surf.addWidget(ui.InputField(description='Path length:', text='200', min_width=90))
+        self.path_length_input = self.config_surf.addWidget(ui.InputField(description='Path length:', text='0', min_width=90))
         self.path_color_multiplier_input = self.config_surf.addWidget(ui.InputField(description='Path color multiplier:', text='0.5', min_width=90))
+        self.draw_lines_input = self.config_surf.addWidget(ui.InputField(description='Draw lines:', text='False', min_width=90))
+        self.bg_alpha_input = self.config_surf.addWidget(ui.InputField(description='Background alpha:', text='0.1', min_width=90))
 
 
     def createBody(self):
@@ -71,6 +73,11 @@ class Application:
 
         # Render & update bodies
         for body in self.bodies:
+            if self.draw_lines_input.text == 'True':
+                for other in self.bodies:
+                    if body != other:
+                        pygame.draw.line(self.screen, (255, 255, 255), body.position.toTuple(), other.position.toTuple(), 1)
+
             body.render()
 
             if self.paused:
@@ -135,7 +142,13 @@ class Application:
 
 
             # Clear the screen
-            self.screen.fill((0, 0, 0))
+            try:
+                bg_alpha = float(self.bg_alpha_input.text)
+            except ValueError:
+                bg_alpha = 1
+            bg_img = pygame.Surface((self.screen.get_width(), self.screen.get_height()), pygame.SRCALPHA)
+            pygame.draw.rect(bg_img, (0, 0, 0, 255 * bg_alpha), bg_img.get_rect())
+            self.screen.blit(bg_img, (0, 0))
 
             # Render & update the bodies
             self.handleBodies()
