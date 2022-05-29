@@ -17,16 +17,12 @@ class Surface(pygame.Surface):
             * bg_color (pygame.Color, optional=Surface.BG_COLOR) - The background color of the surface.
         '''
 
-        # Initialize the superclass
         super().__init__((size.x, size.y))
         self.topleft = topleft
         self.size = size
         self.vertical_seperator = vertical_seperator
         self.bg_color = bg_color
-
-        # The widgets inside this surface
         self.widgets = []
-
         Surface.instances.append(self)
 
     
