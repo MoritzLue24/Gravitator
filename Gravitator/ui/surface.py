@@ -17,7 +17,7 @@ class Surface(pygame.Surface):
             * bg_color (pygame.Color, optional=Surface.BG_COLOR) - The background color of the surface.
         '''
 
-        # Initialize the superclass (sdl2.SDL_Rect)
+        # Initialize the superclass
         super().__init__((size.x, size.y))
         self.topleft = topleft
         self.size = size
