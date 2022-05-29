@@ -69,7 +69,7 @@ class Body:
 
             # Multiply the color by the distance and by the path color multiplier to make it more / less visible
             color = [constrain(dist * Body.path_color_multiplier * c, 0, 255) for c in Body.PATH_COLOR]
-            pygame.draw.line(pygame.display.get_surface(), (255, 255, 255), self.path[p].round().toTuple(), self.path[p+1].round().toTuple(), 1)
+            pygame.draw.line(pygame.display.get_surface(), color, self.path[p].round().toTuple(), self.path[p+1].round().toTuple(), 1)
 
         pygame.draw.circle(pygame.display.get_surface(), self.color, self.position.round().toTuple(), self.radius)
 
