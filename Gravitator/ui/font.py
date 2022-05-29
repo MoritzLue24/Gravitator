@@ -51,4 +51,3 @@ class Font(pygame.font.Font):
         
         # Render the text
         surface.blit(text_surf, topleft.toTuple())
-

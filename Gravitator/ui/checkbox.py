@@ -54,4 +54,3 @@ class Checkbox(Widget):
         
         # Draw the checkbox
         pygame.draw.rect(self.surface, Widget.PASSIVE_COLOR, pygame.Rect(self.surface.vertical_seperator, self.topleft.y, box_size, box_size), 2)
-        
