@@ -91,7 +91,7 @@ class Application:
                     self.bodies.clear()
                     exec(f.read())
                 except Exception as e:
-                    messagebox.showerror('Error', 'An error occured while running the script:\n{}'.format(e))
+                    messagebox.showerror('Error', f'An error occured while running the script {self.current_script.split("/")[-1]}: \n{e}')
         except FileNotFoundError:
             pass
 
@@ -107,7 +107,6 @@ class Application:
             radius = float(self.radius_input.text)
         except ValueError:
             return None
-
         return Body(Vector(pygame.mouse.get_pos()), Vector2(0, 0), mass, radius)
 
 
@@ -119,39 +118,33 @@ class Application:
 
         # Draw & update bodies
         for body in self.bodies:
-            if self.draw_lines_input.checked:
-                for other in self.bodies:
-                    if body != other:
-                        pygame.draw.line(self.screen, (255, 255, 255), body.position.toTuple(), other.position.toTuple(), 1)
-
-            body.draw()
-
-            if self.paused:
-                continue
-
             for other in self.bodies:
                 if body != other:
-                    body.attract(other, self.g)
+                    if self.draw_lines_input.checked:
+                        pygame.draw.line(self.screen, (255, 255, 255), body.position.toTuple(), other.position.toTuple(), 1)
 
-            body.update(self.delta_time)
+                    if not self.paused:
+                        body.attract(other, self.g)
+
+            body.draw()
+            if not self.paused: 
+                body.update(self.delta_time)
 
         # Update the initial velocity of the body based on the mouse position if the user is creating a body
         if self.current_body:
             mouse_pos = Vector(pygame.mouse.get_pos())
-
             self.current_body.velocity = self.current_body.position - mouse_pos
 
             # Draw a line from the current mouse position to the position of the body
             pygame.draw.line(self.screen, (0, 0, 255), mouse_pos.toTuple(), self.current_body.position.toTuple())
             self.current_body.draw()
 
-    
+
     def run(self):
         '''
         Run this function to start the main loop.
         '''
 
-        # Mainloop
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

@@ -4,6 +4,7 @@ from VectorUtils import Vector2
 
 class Surface(pygame.Surface):
     BG_COLOR = (20, 20, 20)
+    CAN_CLICK_THROUGH = False
     instances = []
     def __init__(self, topleft: Vector2, size: Vector2, vertical_seperator: int, bg_color: pygame.Color=BG_COLOR):
         '''
@@ -42,7 +43,7 @@ class Surface(pygame.Surface):
             for widget in surface.widgets:
                 if widget.handleEvents(event):
                     event_handled = True
-            if pygame.Rect(surface.topleft.combineToList(surface.size)).collidepoint(pygame.mouse.get_pos()):
+            if pygame.Rect(surface.topleft.combineToList(surface.size)).collidepoint(pygame.mouse.get_pos()) and Surface.CAN_CLICK_THROUGH:
                 event_handled = True
         
         return event_handled
