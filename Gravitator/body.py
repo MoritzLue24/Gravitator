@@ -6,8 +6,10 @@ from VectorUtils import Vector2
 
 class Body:
     COLOR = (200, 10, 10)
+    PATH_COLOR = (0, 255, 0)
     path_length = 200
     path_color_multiplier = 0.5
+
     def __init__(self, position: Vector2, velocity: Vector2, mass: float, radius: float):
         '''
         The Body class is responsible for creating a body that is affected by gravity of other bodies.
@@ -32,11 +34,9 @@ class Body:
         '''
         Apply a force to the body.
         '''
-
-        try:
-            self.acceleration += force / self.mass
-        except ZeroDivisionError:
-            pass
+        
+        if self.mass <= 0: return
+        self.acceleration += force / self.mass
     
 
     def attract(self, body, g: float):
@@ -61,19 +61,16 @@ class Body:
 
         # Draw the path of the body
         for p in range(len(self.path)):
-            # Skip the first point to avoid graphical glitches
-            # TODO: Fix this in a better way
-            if p == 0: continue
-            if p+1 != len(self.path):
-                # Get dist between the last two points to calculate the color
-                # (The bigger the distance, the brighter the color)
+            if (p == 0) or (p+1 == len(self.path)): continue
 
-                dist = self.path[p].getDist(self.path[p-1])
-                color = [constrain(dist * Body.path_color_multiplier * c, 0, 255) for c in [0, 255, 0]]
+            # Get dist between the last two points to calculate the color
+            # (The bigger the distance, the brighter the color)
+            dist = self.path[p].getDist(self.path[p-1])
 
-                pygame.draw.line(pygame.display.get_surface(), color, self.path[p].round().toTuple(), self.path[p+1].toTuple(), 1)
+            # Multiply the color by the distance and by the path color multiplier to make it more / less visible
+            color = [constrain(dist * Body.path_color_multiplier * c, 0, 255) for c in Body.PATH_COLOR]
+            pygame.draw.line(pygame.display.get_surface(), (255, 255, 255), self.path[p].round().toTuple(), self.path[p+1].round().toTuple(), 1)
 
-        # Draw the body
         pygame.draw.circle(pygame.display.get_surface(), self.color, self.position.round().toTuple(), self.radius)
 
     
@@ -82,14 +79,11 @@ class Body:
         Update the body.
         '''
 
-        # Remove the last point from the path if the path is too long
+        # Remove the last point from the path if the path exceeds the max length
         if len(self.path) >= Body.path_length:
             self.path = self.path[int(len(self.path) - Body.path_length):]
-
-        # Add the current position to the path
         self.path.append(self.position)
 
-        # Update the position and velocity of the body.
         self.velocity += self.acceleration * deltaTime
         self.position += self.velocity * deltaTime
         self.acceleration = Vector2(0, 0)
