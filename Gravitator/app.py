@@ -29,7 +29,6 @@ class Application:
         # Running and pause variables (if paused, the physics will not be calculated)
         self.running = True
         self.paused = False
-        self.g = 400
 
         # Deltatime
         self.delta_time = 0.0
@@ -124,7 +123,10 @@ class Application:
                         pygame.draw.line(self.screen, (255, 255, 255), body.position.toTuple(), other.position.toTuple(), 1)
 
                     if not self.paused:
-                        body.attract(other, self.g)
+                        try:
+                            body.attract(other, float(self.g_input.text))
+                        except ValueError:
+                            body.attract(other, 400)
 
             body.draw()
             if not self.paused: 
@@ -154,7 +156,7 @@ class Application:
                 if self.config_surf.handleEvents(event) or ui.Widget.oneActive():
                     continue
                 
-                # If the user presses the escape key, the physics will be paused
+                # Key events
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.paused = not self.paused
@@ -163,7 +165,7 @@ class Application:
                     elif event.key == pygame.K_c:
                         self.bodies = []
 
-                # Handle body events
+                # Mouse events
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         self.current_body = self.createBody()
@@ -171,6 +173,7 @@ class Application:
                         for body in self.bodies:
                             if body.position.getDist(Vector(pygame.mouse.get_pos())) < body.radius + 10:
                                 self.dragged_body = body
+                                self.dragged_body.color = (10, 200, 10)
                                 break
 
                 elif (event.type == pygame.MOUSEBUTTONUP):
@@ -179,25 +182,22 @@ class Application:
                         self.current_body = None
                     elif (event.button == 3) and self.dragged_body:
                         self.dragged_body.color = Body.COLOR
+                        self.dragged_body.velocity = Vector2(0, 0)
                         self.dragged_body = None
 
 
-            # Update g & path length & path color
+            # Update path length & color
             try:
-                self.g = float(self.g_input.text)
                 Body.path_length = int(self.path_length_input.text)
                 Body.path_color_multiplier = float(self.path_color_multiplier_input.text)
             except ValueError:
                 pass
                 
-            # Update the dragged body's position & color
+            # Update the dragged body's position
             if self.dragged_body:
                 self.dragged_body.position = Vector(pygame.mouse.get_pos())
-                self.dragged_body.velocity = Vector2(0, 0)
-                self.dragged_body.color = (10, 200, 10)
 
-
-            # Clear the screen
+            # Clear the screen with a transparent background or not, depending on the user input
             try:
                 bg_alpha = float(self.bg_alpha_input.text) * self.delta_time
             except ValueError:
