@@ -5,6 +5,7 @@ from VectorUtils import Vector2
 
 
 class Body:
+    COLOR = (200, 10, 10)
     path_length = 200
     path_color_multiplier = 0.5
     def __init__(self, position: Vector2, velocity: Vector2, mass: float, radius: float):
@@ -23,6 +24,7 @@ class Body:
         self.acceleration = Vector2(0, 0)
         self.mass = mass
         self.radius = radius
+        self.color = Body.COLOR
         self.path = []
 
 
@@ -52,9 +54,9 @@ class Body:
         body.applyForce(force)
 
 
-    def render(self):
+    def draw(self):
         '''
-        Render the body & the path.
+        Draws the body & the path.
         '''
 
         # Draw the path of the body
@@ -69,10 +71,10 @@ class Body:
                 dist = self.path[p].getDist(self.path[p-1])
                 color = [constrain(dist * Body.path_color_multiplier * c, 0, 255) for c in [0, 255, 0]]
 
-                pygame.draw.line(pygame.display.get_surface(), color, self.path[p].toTuple(), self.path[p+1].toTuple(), 1)
+                pygame.draw.line(pygame.display.get_surface(), color, self.path[p].round().toTuple(), self.path[p+1].toTuple(), 1)
 
         # Draw the body
-        pygame.draw.circle(pygame.display.get_surface(), (255, 0, 0), self.position.toTuple(), self.radius)
+        pygame.draw.circle(pygame.display.get_surface(), self.color, self.position.round().toTuple(), self.radius)
 
     
     def update(self, deltaTime: float):

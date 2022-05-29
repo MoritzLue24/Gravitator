@@ -47,8 +47,8 @@ class Widget:
         return False
 
 
-    def render(self):
+    def draw(self):
         '''
-        Render the widget. The offset is the topleft position of parent surface.
+        Draws the widget. The offset is the topleft position of parent surface.
         '''
         pass

@@ -60,16 +60,16 @@ class Surface(pygame.Surface):
         return event_handled
 
 
-    def render(self):
+    def draw(self):
         '''
-        Render all widgets and the surface
+        Draw all widgets and the surface
         '''
 
-        # Render the background rect
+        # draw the background rect
         self.fill(self.bg_color)
 
-        # Render all widgets
+        # draw all widgets
         for widget in self.widgets:
-            widget.render()
+            widget.draw()
 
         pygame.display.get_surface().blit(self, self.topleft.toTuple())

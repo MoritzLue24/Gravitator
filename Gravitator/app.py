@@ -34,8 +34,9 @@ class Application:
         # Every body in the simulation is inside this list
         self.bodies = []
 
-        # If the user wants to add a body, this is the variable that will be used
+        # If the user wants to add & move a body, these is the variable that will be used
         self.current_body = None
+        self.dragged_body = None
 
         # UI
         ui.Font('assets/Fonts/Roboto-Regular.ttf', 16, (225, 225, 225))
@@ -46,7 +47,7 @@ class Application:
         self.g_input = self.config_surf.addWidget(ui.InputField(description='G:', text='400.0', min_width=90))
         self.path_length_input = self.config_surf.addWidget(ui.InputField(description='Path length:', text='0', min_width=90))
         self.path_color_multiplier_input = self.config_surf.addWidget(ui.InputField(description='Path color multiplier:', text='0.5', min_width=90))
-        self.draw_lines_input = self.config_surf.addWidget(ui.InputField(description='Draw lines:', text='False', min_width=90))
+        self.draw_lines_input = self.config_surf.addWidget(ui.Checkbox(description='Draw lines:', checked=True))
         self.bg_alpha_input = self.config_surf.addWidget(ui.InputField(description='Background alpha:', text='0.1', min_width=90))
 
 
@@ -71,14 +72,14 @@ class Application:
         It handles the bodies and their interactions.
         '''
 
-        # Render & update bodies
+        # Draw & update bodies
         for body in self.bodies:
-            if self.draw_lines_input.text == 'True':
+            if self.draw_lines_input.checked:
                 for other in self.bodies:
                     if body != other:
                         pygame.draw.line(self.screen, (255, 255, 255), body.position.toTuple(), other.position.toTuple(), 1)
 
-            body.render()
+            body.draw()
 
             if self.paused:
                 continue
@@ -97,7 +98,7 @@ class Application:
 
             # Draw a line from the current mouse position to the position of the body
             pygame.draw.line(self.screen, (0, 0, 255), mouse_pos.toTuple(), self.current_body.position.toTuple())
-            self.current_body.render()
+            self.current_body.draw()
 
     
     def run(self):
@@ -125,11 +126,22 @@ class Application:
                         self.bodies = []
 
                 # Handle body events
-                elif (event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 1):
-                    self.current_body = self.createBody()
-                elif (event.type == pygame.MOUSEBUTTONUP) and (event.button == 1) and self.current_body:
-                    self.bodies.append(self.current_body)
-                    self.current_body = None
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        self.current_body = self.createBody()
+                    elif event.button == 3:
+                        for body in self.bodies:
+                            if body.position.getDist(Vector2.fromTuple(pygame.mouse.get_pos())) < body.radius + 10:
+                                self.dragged_body = body
+                                break
+
+                elif (event.type == pygame.MOUSEBUTTONUP):
+                    if (event.button == 1) and self.current_body:
+                        self.bodies.append(self.current_body)
+                        self.current_body = None
+                    elif (event.button == 3) and self.dragged_body:
+                        self.dragged_body.color = Body.COLOR
+                        self.dragged_body = None
 
 
             # Update g & path length & path color
@@ -139,6 +151,12 @@ class Application:
                 Body.path_color_multiplier = float(self.path_color_multiplier_input.text)
             except ValueError:
                 pass
+                
+            # Update the dragged body's position & color
+            if self.dragged_body:
+                self.dragged_body.position = Vector2.fromTuple(pygame.mouse.get_pos())
+                self.dragged_body.velocity = Vector2(0, 0)
+                self.dragged_body.color = (10, 200, 10)
 
 
             # Clear the screen
@@ -150,17 +168,17 @@ class Application:
             pygame.draw.rect(bg_img, (0, 0, 0, 255 * bg_alpha), bg_img.get_rect())
             self.screen.blit(bg_img, (0, 0))
 
-            # Render & update the bodies
+            # Draw & update the bodies
             self.handleBodies()
 
             # Display the ui
-            self.config_surf.render()
+            self.config_surf.draw()
 
-            # Render the pause / unpause image on the bottom left
+            # Draw the pause / unpause image on the bottom left
             img = pygame.transform.scale(pygame.image.load(f'assets/{"paused" if self.paused else "running"}_icon.png'), (32, 32))
             self.screen.blit(img, (5, self.screen.get_height() - 37))
 
-            # Render & delta time
+            # Draw & delta time
             pygame.display.flip()
             self.delta_time = self.clock.tick(60) / 1000.0
             self.fps_text.text = 'FPS: ' + str(round(1 / self.delta_time, 1))

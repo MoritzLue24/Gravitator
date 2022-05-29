@@ -41,7 +41,7 @@ class Font(pygame.font.Font):
 
 
     @staticmethod
-    def myRender(surface: pygame.Surface, text: str, topleft: Vector2):
+    def draw(surface: pygame.Surface, text: str, topleft: Vector2):
         '''
         Render the text on the surface.
         '''

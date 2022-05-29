@@ -79,9 +79,9 @@ class InputField(Widget):
         return False
 
 
-    def render(self, surface: pygame.Surface=None):
+    def draw(self, surface: pygame.Surface=None):
         '''
-        Render the text input field.
+        Draws the text input field.
         '''
         
         # Calculate the description rect and the text rect
@@ -93,16 +93,12 @@ class InputField(Widget):
         )
 
         # Render the background
-        # renderer.fill(desc_rect, sdl2.ext.Color(255, 20, 20))
-        # renderer.fill(text_rect, sdl2.ext.Color(20, 20, 255))
-
         surf = self.surface if self.surface else surface
-
         pygame.draw.rect(surf, Widget.ACTIVE_COLOR if self.active else Widget.PASSIVE_COLOR, text_rect, 2)
 
 
         # Render the description
-        Font.myRender(surf, self.description, self.topleft + Widget.TEXT_MARGIN)
+        Font.draw(surf, self.description, self.topleft + Widget.TEXT_MARGIN)
 
         # Render the default text
-        Font.myRender(surf, self.text, Vector2(text_rect[0], text_rect[1]) + Widget.TEXT_MARGIN)
+        Font.draw(surf, self.text, Vector2(text_rect[0], text_rect[1]) + Widget.TEXT_MARGIN)

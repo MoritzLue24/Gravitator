@@ -20,18 +20,15 @@ class Text(Widget):
         self.underlined = kwargs.get('underlined', True)
 
     
-    def render(self):
+    def draw(self):
         '''
-        Render the text using the static ui.Font.render method.
+        Draws the text using the static ui.Font.draw method.
         '''
 
-        #rect = (self.topleft + Vector2(self.surface.x, self.surface.y)).combineToList(Font.getRenderSize(self.text) + Widget.TEXT_MARGIN * 2)
-        #renderer.draw_rect(rect, Widget.ACTIVE_COLOR if self.active else Widget.PASSIVE_COLOR)
+        # Draw the text
+        Font.draw(self.surface, self.text, self.topleft + Widget.TEXT_MARGIN)
 
-        # Render the text
-        Font.myRender(self.surface, self.text, self.topleft + Widget.TEXT_MARGIN)
-
-        # Render underline if widget.underlined
+        # Draw underline if widget.underlined
         if self.underlined:
             height = Font.getRenderSize(self.text).y + Widget.TEXT_MARGIN * 2
             a = Vector2(self.topleft.x, self.topleft.y + height)
