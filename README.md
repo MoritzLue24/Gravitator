@@ -12,8 +12,9 @@ Simulate the behavior of the gravitation between celestial objects.
 * Run with python ```python Gravitator```
 
 ## Controls
-* Press and hold left mouse button to create a body.
-* Press backspace to remove the last body.
-* Press c to remove all bodies.
-* Press escape to pause / continue.
+* Press and hold <kbd>Left Mouse Button</kbd> to create a body.
+* Press and hold <kbd>Right Mouse Button</kbd>
+* Press <kbd>Backspace</kbd> to remove the last body.
+* Press <kbd>c</kbd> to remove all bodies.
+* Press <kbd>Esc</kbd> to pause / continue.
 
