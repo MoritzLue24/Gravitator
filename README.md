@@ -19,35 +19,4 @@ Simulate the behavior of the gravitation between celestial objects.
 * Press <kbd>Esc</kbd> to pause / continue.
 
 ## Scripts
-If you are running a custom script, you can use the following variables, functions & modules.
-Make sure you use these variables & functions with a ```self.``` in front of them
-
-### Variables
-* ```running```: bool (used for the main loop)
-* ```paused```: bool (used for physics)
-* ```g```: float | int
-* ```delta_time```: float
-* ```bodies```: list
-* ```current_body```: Body | None (when creating a body with <kbd>Leftclick</kbd>, the body gets stored inside this variable)
-* ```dragged_body```: Body | None (when moving a body with <kbd>Rightclick</kbd>, the body gets stored inside this variable)
-* ```config_surf```: ui.Surface
-* ```fps_text```: ui.Text
-* ```run_button```: ui.Button
-* ```mass_input```: ui.InputField
-* ```radius_input```: ui.InputField
-* ```g_input```: ui.InputField
-* ```path_length_input```: ui.InputField
-* ```path_multiplier_input```: ui.InputField
-* ```draw_lines_input```: ui.Checkbox
-* ```bg_alpha_input```: ui.InputField
-
-## Functions
-* ```runScript```
-* ```createBody```
-* ```handleBodies```
-* ```run```
-
-## Modules
-* ```ui```
-* ```pygame```
-* ```tk```
+If you are running a custom script, you can use everything, that is inside the [Gravitator.Application class](Gravitator/app.py). Make sure to write ```self.``` infront of the variables and methods you are using.
