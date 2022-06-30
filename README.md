@@ -1,5 +1,5 @@
 # Gravitator
-Simulate the behavior of the gravitation between celestial objects.
+Simulate the behavior of the gravitation between bodies.
 
 ## Requirements
 * pygame==2.1.2
