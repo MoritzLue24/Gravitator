@@ -106,7 +106,7 @@ class Application:
             radius = float(self.radius_input.text)
         except ValueError:
             return None
-        return Body(Vector(pygame.mouse.get_pos()), Vector2(0, 0), mass, radius)
+        return Body(Vector2(pygame.mouse.get_pos()), Vector2(0, 0), mass, radius)
 
 
     def handleBodies(self):
