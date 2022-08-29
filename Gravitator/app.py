@@ -2,7 +2,7 @@ import pygame
 import tkinter as tk
 import ui
 from tkinter import filedialog, messagebox
-from VectorUtils import Vector2, Vector
+from VectorUtils import Vector2
 from utils import constrain
 from body import Body
 
@@ -106,6 +106,7 @@ class Application:
             radius = float(self.radius_input.text)
         except ValueError:
             return None
+        
         return Body(Vector2(pygame.mouse.get_pos()), Vector2(0, 0), mass, radius)
 
 
@@ -134,7 +135,7 @@ class Application:
 
         # Update the initial velocity of the body based on the mouse position if the user is creating a body
         if self.current_body:
-            mouse_pos = Vector(pygame.mouse.get_pos())
+            mouse_pos = Vector2(pygame.mouse.get_pos())
             self.current_body.velocity = self.current_body.position - mouse_pos
 
             # Draw a line from the current mouse position to the position of the body
